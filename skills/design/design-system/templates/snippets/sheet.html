@@ -1,0 +1,35 @@
+<!--
+  Sheet snippet: mobile bottom sheet with grabber and action rows.
+  Tokens: --color-scrim, --color-surface, --color-neutral-4, --color-border,
+          --radius-xl, --radius-md, --touch-min, --z-modal, --space-*.
+-->
+<div style="position: fixed; inset: 0; z-index: var(--z-modal); background: var(--color-scrim);">
+  <div role="dialog" aria-modal="true" aria-labelledby="sheet-title" style="
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 75vh;
+    overflow-y: auto;
+    padding: var(--space-3) var(--space-4) var(--space-6);
+    background: var(--color-surface);
+    border-top-left-radius: var(--radius-xl);
+    border-top-right-radius: var(--radius-xl);
+    box-shadow: var(--shadow-whisper);
+  ">
+    <div aria-hidden="true" style="
+      width: 36px;
+      height: var(--space-1);
+      margin: 0 auto var(--space-4);
+      border-radius: var(--radius-pill);
+      background: var(--color-neutral-4);
+    "></div>
+    <h2 id="sheet-title" class="t-title" style="margin: 0 0 var(--space-1);">Share</h2>
+    <p class="t-secondary" style="margin: 0 0 var(--space-4);">Pick one option.</p>
+    <ul style="list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2);">
+      <li><button class="btn" type="button" style="width: 100%; justify-content: flex-start;">Copy link</button></li>
+      <li><button class="btn" type="button" style="width: 100%; justify-content: flex-start;">Export as Markdown</button></li>
+      <li><button class="btn" type="button" style="width: 100%; justify-content: flex-start;">More options</button></li>
+    </ul>
+  </div>
+</div>

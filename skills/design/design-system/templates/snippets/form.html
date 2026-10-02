@@ -1,0 +1,29 @@
+<!--
+  Form snippet: labelled fields, helper text, one primary action.
+  Tokens: --color-neutral-{7,9}, --color-danger, --space-*, .field / .btn from scaffold.
+-->
+<form style="display: grid; gap: var(--space-4); max-width: 480px;" onsubmit="event.preventDefault()">
+  <div style="display: grid; gap: var(--space-1);">
+    <label for="f-name" class="t-secondary" style="color: var(--color-neutral-9); font-weight: var(--font-weight-medium);">Name</label>
+    <input id="f-name" class="field" type="text" placeholder="How should we call you?" />
+  </div>
+
+  <div style="display: grid; gap: var(--space-1);">
+    <label for="f-email" class="t-secondary" style="color: var(--color-neutral-9); font-weight: var(--font-weight-medium);">
+      Email <span style="color: var(--color-neutral-7); font-weight: var(--font-weight-regular);">(private)</span>
+    </label>
+    <input id="f-email" class="field" type="email" placeholder="you@example.com" aria-describedby="f-email-err" />
+    <!-- Error = danger color + icon shape + text, never color alone. -->
+    <p id="f-email-err" class="t-meta" style="margin: 0; color: var(--color-danger);">⊗ Enter a valid email address</p>
+  </div>
+
+  <div style="display: grid; gap: var(--space-1);">
+    <label for="f-body" class="t-secondary" style="color: var(--color-neutral-9); font-weight: var(--font-weight-medium);">Message</label>
+    <textarea id="f-body" class="field" rows="4" placeholder="Write something" style="resize: vertical;"></textarea>
+    <p class="t-meta" style="margin: 0;">Helper text in the meta role.</p>
+  </div>
+
+  <div style="display: flex; justify-content: flex-end;">
+    <button class="btn btn-primary" type="submit">Send</button>
+  </div>
+</form>

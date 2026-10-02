@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mockup Scaffold</title>
+  <!--
+    Point this at your project's tokens file when you copy the scaffold
+    (the `tokensCss` path in design-system.config.json). Never inline hex here:
+    every value below must come from a token.
+  -->
+  <link rel="stylesheet" href="../tokens/tokens.example.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--color-bg);
+      color: var(--color-neutral-9);
+      font-family: var(--font-sans);
+      font-size: var(--text-body);
+      line-height: var(--text-body--line-height);
+    }
+
+    /* Type roles: the only way snippets set text size. */
+    .t-display   { font-size: var(--text-display);   line-height: var(--text-display--line-height);   font-weight: var(--font-weight-medium); color: var(--color-neutral-10); }
+    .t-title     { font-size: var(--text-title);     line-height: var(--text-title--line-height);     font-weight: var(--font-weight-medium); color: var(--color-neutral-10); }
+    .t-body      { font-size: var(--text-body);      line-height: var(--text-body--line-height); }
+    .t-secondary { font-size: var(--text-secondary); line-height: var(--text-secondary--line-height); color: var(--color-neutral-7); }
+    .t-meta      { font-size: var(--text-meta);      line-height: var(--text-meta--line-height);      color: var(--color-neutral-7); }
+    .t-eyebrow   { font-size: var(--text-eyebrow);   line-height: var(--text-eyebrow--line-height);   letter-spacing: var(--text-eyebrow--letter-spacing); text-transform: uppercase; font-weight: var(--font-weight-semibold); color: var(--color-neutral-7); }
+    .t-mono      { font-family: var(--font-mono); font-size: var(--text-mono); line-height: var(--text-mono--line-height); }
+
+    /* Shared controls */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: var(--touch-min);
+      padding: 0 var(--space-4);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      background: var(--color-neutral-2);
+      color: var(--color-neutral-9);
+      font: inherit;
+      font-weight: var(--font-weight-medium);
+      cursor: pointer;
+      transition: transform var(--duration-press) var(--ease-standard),
+                  background var(--duration-settle) var(--ease-standard);
+    }
+    .btn:hover { background: var(--color-neutral-3); }
+    .btn:active { transform: scale(0.98); }
+    .btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+    .btn-primary { background: var(--color-accent); color: var(--color-on-accent); border-color: transparent; }
+    .btn-primary:hover { background: var(--color-accent); filter: brightness(1.05); }
+    .btn-danger { background: var(--color-danger); color: var(--color-on-accent); border-color: transparent; }
+    .field {
+      width: 100%;
+      min-height: var(--touch-min);
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      color: var(--color-neutral-9);
+      font: inherit;
+      outline: none;
+    }
+    .field:focus { border-color: var(--color-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 20%, transparent); }
+
+    .mockup-shell { max-width: 960px; margin: 0 auto; padding: var(--space-6) var(--space-4); }
+    .theme-toggle { position: fixed; top: var(--space-3); right: var(--space-3); z-index: var(--z-toast); }
+  </style>
+</head>
+<body>
+  <button class="btn t-meta theme-toggle" type="button"
+    onclick="const r=document.documentElement; r.dataset.theme = r.dataset.theme === 'dark' ? 'light' : 'dark'">
+    light / dark
+  </button>
+
+  <main class="mockup-shell">
+    <!--
+      Paste snippets from templates/snippets/ here. They rely on the token
+      variables and the .t-* / .btn / .field classes defined above.
+    -->
+  </main>
+</body>
+</html>

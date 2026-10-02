@@ -1,0 +1,37 @@
+<!--
+  Modal snippet: confirm dialog for desktop / wide layouts (use sheet.html on phones).
+  Tokens: --color-scrim, --color-surface, --color-border, --shadow-whisper,
+          --blur-overlay, --radius-lg, --z-modal, --space-*.
+-->
+<div style="
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: grid;
+  place-items: center;
+  background: var(--color-scrim);
+  backdrop-filter: blur(var(--blur-overlay));
+  -webkit-backdrop-filter: blur(var(--blur-overlay));
+">
+  <div role="dialog" aria-modal="true" aria-labelledby="modal-title" style="
+    width: min(480px, calc(100vw - 2 * var(--space-4)));
+    display: grid;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-whisper);
+  ">
+    <header>
+      <h2 id="modal-title" class="t-title" style="margin: 0;">Delete this item?</h2>
+      <p class="t-secondary" style="margin: var(--space-2) 0 0;">
+        This cannot be undone. Explain the consequence in one sentence.
+      </p>
+    </header>
+    <footer style="display: flex; justify-content: flex-end; gap: var(--space-2);">
+      <button class="btn" type="button">Cancel</button>
+      <button class="btn btn-danger" type="button">Delete</button>
+    </footer>
+  </div>
+</div>

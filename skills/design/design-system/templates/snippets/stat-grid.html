@@ -1,0 +1,23 @@
+<!--
+  Stat grid snippet: dashboard / profile numbers.
+  Tokens: --color-neutral-{2,10}, --color-accent, --color-border, --radius-md, display/eyebrow roles.
+  The accent value marks the one number that is live / in progress, nothing else.
+-->
+<section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--space-4); padding: var(--space-5) 0;">
+  <article style="background: var(--color-neutral-2); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-4);">
+    <p class="t-eyebrow" style="margin: 0 0 var(--space-1);">Items</p>
+    <p class="t-display" style="margin: 0; font-variant-numeric: tabular-nums;">128</p>
+  </article>
+  <article style="background: var(--color-neutral-2); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-4);">
+    <p class="t-eyebrow" style="margin: 0 0 var(--space-1);">Running</p>
+    <p class="t-display" style="margin: 0; font-variant-numeric: tabular-nums; color: var(--color-accent);">3</p>
+  </article>
+  <article style="background: var(--color-neutral-2); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-4);">
+    <p class="t-eyebrow" style="margin: 0 0 var(--space-1);">Completed</p>
+    <p class="t-display" style="margin: 0; font-variant-numeric: tabular-nums;">1,204</p>
+  </article>
+  <article style="background: var(--color-neutral-2); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-4);">
+    <p class="t-eyebrow" style="margin: 0 0 var(--space-1);">Days active</p>
+    <p class="t-display" style="margin: 0; font-variant-numeric: tabular-nums;">42</p>
+  </article>
+</section>

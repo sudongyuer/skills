@@ -1,0 +1,28 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Structure, links and privacy
+        run: node scripts/validate.mjs --privacy
+      - name: Script tests (Node)
+        run: node --test 'scripts/*.test.mjs' 'skills/**/*.test.mjs'
+      - name: Script tests (shell)
+        run: |
+          for t in skills/*/*/scripts/test-*.sh; do
+            [ -f "$t" ] || continue
+            echo "== $t"
+            bash "$t"
+          done
+      - name: Install dry run
+        run: SKILLS_TARGETS="$RUNNER_TEMP/a:$RUNNER_TEMP/b" ./install.sh

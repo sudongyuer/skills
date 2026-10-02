@@ -1,0 +1,22 @@
+{
+  "cheatsheet": ".claude/skills/design-system/CHEATSHEET.md",
+  "tokensCss": "src/styles/tokens.css",
+  "tokensTs": "src/theme/tokens.ts",
+  "componentsDir": "src/components/ui",
+  "lintCommand": "pnpm lint",
+  "scan": ["src/**/*.{css,tsx,jsx,ts}", "docs/mockups/**/*.html"],
+  "ignore": ["src/**/*.test.*", "src/generated/**"],
+  "allowHex": [],
+  "forbid": [
+    {
+      "id": "tailwind-default-neutral",
+      "pattern": "\\b(?:text|bg|border|ring|fill|stroke)-(?:neutral|gray|slate|zinc)-(?:50|[1-9]00|950)\\b",
+      "message": "Tailwind default palette; use --color-neutral-1..10"
+    },
+    {
+      "id": "tailwind-default-size",
+      "pattern": "\\btext-(?:xs|sm|base|lg|[2-9]?xl)\\b",
+      "message": "Tailwind default text size; use a type-role utility"
+    }
+  ]
+}
