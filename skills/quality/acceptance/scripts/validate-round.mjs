@@ -4,8 +4,11 @@
 //   node validate-round.mjs new <slug> [--root .acceptance]   allocate the next round dir
 //   node validate-round.mjs check <round-dir>                 validate, print coverage
 //   node validate-round.mjs seal <round-dir>                  validate, render report.md, freeze
-//   node validate-round.mjs pr-body <round-dir> --asset-base <url>
-//                                                             print report.md with remote asset links
+//   node validate-round.mjs pr-body <round-dir> [--asset-base <url>]
+//                                                             print report.md; with --asset-base links are
+//                                                             remote, without it they stay round-relative
+//                                                             for `gh ... --attach` to rewrite
+//   node validate-round.mjs pr-assets <round-dir>             list evidence files `gh --attach` can upload
 //
 // Contract: references/report.md. Exit code 1 on any error.
 
@@ -34,6 +37,7 @@ export const VERDICTS = ['pass', 'fail', 'partial'];
 export const SEAL_FILE = '.sealed.json';
 const ROUND_RE = /^round-(\d+)$/;
 const IMAGE_TYPES = new Set(['screenshot', 'gif']);
+const ATTACHABLE_EXT = /\.(png|jpe?g|gif|webp|mp4|mov|webm)$/i;
 
 // Programmatic gates are never acceptance checks. Matched on title, category, AND method.
 export const GATE_PATTERNS = [
@@ -411,6 +415,20 @@ function renderEvidence(e, base) {
 
 const cell = (v) => String(v ?? '').replace(/\|/g, '\\|').replace(/\n/g, ' ');
 
+export function attachableAssets(result) {
+  const seen = new Set();
+  const attach = [];
+  const other = [];
+  for (const c of result.cases || []) {
+    for (const e of c.evidence || []) {
+      if (!e?.path || seen.has(e.path)) continue;
+      seen.add(e.path);
+      (ATTACHABLE_EXT.test(e.path) ? attach : other).push(e.path);
+    }
+  }
+  return { attach, other };
+}
+
 export function renderReport(result, { assetBase, interactionCost } = {}) {
   const cases = result.cases || [];
   const count = (st) => cases.filter((c) => c.status === st).length;
@@ -555,14 +573,22 @@ function main(argv) {
     }
     if (cmd === 'pr-body') {
       const base = flag('--asset-base');
-      if (!base) throw new Error('pr-body needs --asset-base <url>');
       const v = validateRound(target);
       report(v);
       if (v.errors.length) return 1;
       process.stdout.write(renderReport(v.result, { assetBase: base, interactionCost: traceCost(path.resolve(target)) }));
       return 0;
     }
-    console.error('usage: validate-round.mjs new <slug> [--root dir] | check <round-dir> | seal <round-dir> | pr-body <round-dir> --asset-base <url>');
+    if (cmd === 'pr-assets') {
+      const v = validateRound(target);
+      report(v);
+      if (v.errors.length) return 1;
+      const { attach, other } = attachableAssets(v.result);
+      for (const p of attach) console.log(p);
+      for (const p of other) console.error(`not attachable with gh --attach (inline it or use the evidence branch): ${p}`);
+      return 0;
+    }
+    console.error('usage: validate-round.mjs new <slug> [--root dir] | check <round-dir> | seal <round-dir> | pr-body <round-dir> [--asset-base <url>] | pr-assets <round-dir>');
     return 2;
   } catch (e) {
     console.error(`error: ${e.message}`);

@@ -318,6 +318,30 @@ describe('CLI', () => {
     assert.match(bad.stderr, /file not found/);
   });
 
+  test('pr-body without --asset-base keeps round-relative links and pr-assets lists attachable files', () => {
+    const dir = newRound(path.join(root, '.acceptance'), 'note-export');
+    writeAsset(dir, 'export-dialog.png', 'png');
+    writeAsset(dir, 'flow.mp4', 'mp4');
+    const c = exportCase(dir);
+    c.requiredEvidence = [...(c.requiredEvidence || []), 'screenshot', 'video'];
+    c.evidence = [
+      ...c.evidence,
+      { type: 'screenshot', path: 'assets/export-dialog.png', caption: 'Export dialog', provenance: 'agent-browser' },
+      { type: 'video', path: 'assets/flow.mp4', caption: 'Export flow', provenance: 'cdp' },
+    ];
+    writeResult(dir, 1, [c]);
+
+    const body = spawnSync(process.execPath, [SCRIPT, 'pr-body', dir], { encoding: 'utf8' });
+    assert.equal(body.status, 0, body.stderr);
+    assert.match(body.stdout, /!\[Export dialog\]\(assets\/export-dialog\.png\)/);
+    assert.doesNotMatch(body.stdout, /https?:\/\//);
+
+    const assets = spawnSync(process.execPath, [SCRIPT, 'pr-assets', dir], { encoding: 'utf8' });
+    assert.equal(assets.status, 0, assets.stderr);
+    assert.deepEqual(assets.stdout.trim().split('\n'), ['assets/export-dialog.png', 'assets/flow.mp4']);
+    assert.match(assets.stderr, /not attachable with gh --attach .*: assets\/export\.txt/);
+  });
+
   test('new prints the allocated directory under --root', () => {
     const res = spawnSync(process.execPath, [SCRIPT, 'new', 'note-export', '--root', path.join(root, '.acceptance')], {
       encoding: 'utf8',

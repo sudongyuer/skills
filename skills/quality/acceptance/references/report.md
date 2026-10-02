@@ -324,10 +324,41 @@ path; every image or video must resolve to an uploaded URL the reviewer can open
 **Pushing evidence is a remote write — ask the user before the first push**, and
 follow `PROJECT.md` if it names an evidence store.
 
-Default host: a dedicated evidence branch that is never merged, holding only
-round assets, linked by commit SHA so later pushes never change what a reviewer
-saw. Built with a throwaway index so your working tree and staging area are not
-touched:
+Choose the upload method by the installed `gh` (check with `gh --version`, or
+`gh pr comment --help | grep -- --attach`):
+
+| `gh` version | Method | Result |
+| --- | --- | --- |
+| 2.99.0 or newer | **A. `--attach`** (default) | Files are uploaded to GitHub's attachment storage; images render inline and videos render as a player; nothing is pushed to the repository |
+| older, or `--attach` unavailable (CI images, other hosts) | **B. Evidence branch** | Files live on a never-merged branch and are linked by commit SHA |
+
+### A. Upload with `gh --attach`
+
+Run from the round directory so the body's `assets/…` references match the
+attached paths; `gh` rewrites each matched reference to the uploaded URL and
+appends any attached file the body does not reference. Up to 50 files per
+command; split larger rounds across a comment plus follow-up comments.
+
+```bash
+ROUND=.acceptance/<slug>/round-<n>
+node <skill-dir>/scripts/validate-round.mjs pr-body "$ROUND" > "$SCRATCH/pr-body.md"
+args=()
+while IFS= read -r f; do args+=(--attach "$f"); done < <(node <skill-dir>/scripts/validate-round.mjs pr-assets "$ROUND")
+(cd "$ROUND" && gh pr comment <pr> --body-file "$SCRATCH/pr-body.md" "${args[@]}")
+```
+
+`pr-assets` prints uploadable media (png, jpg, gif, webp, mp4, mov, webm) on
+stdout and names every other evidence file on stderr. Text-like evidence
+(logs, DOM snapshots, transcripts) cannot be attached: inline a short excerpt in
+the case's observation and host the full file with method B, or ask the user.
+If some uploads fail, `gh` still posts the comment and exits non-zero — treat
+that as a failed landing and fix it in a follow-up comment.
+
+### B. Evidence branch
+
+A dedicated branch that is never merged, holding only round assets, linked by
+commit SHA so later pushes never change what a reviewer saw. Built with a
+throwaway index so your working tree and staging area are not touched:
 
 ```bash
 ROUND=.acceptance/<slug>/round-<n>
@@ -349,10 +380,9 @@ gh pr comment <pr> --body-file "$SCRATCH/pr-body.md"
   the previous one — the PR thread then shows the progression the way the round
   directories do. Use `gh pr edit --body-file` only when the project asks for the
   latest round in the PR description; keep earlier rounds as comments.
-- **Videos**: a repository file link plays only after a click; GitHub plays
-  video inline only for files uploaded through its web editor, which `gh` cannot
-  do. Prefer a GIF for short flows; link the MP4 and say so in its caption, or ask
-  the user to drop the file into the comment if inline playback matters.
+- **Videos**: method A renders an attached video as a player. With method B a
+  repository file link plays only after a click; prefer a GIF for short flows
+  and say in the caption that the MP4 is a link.
 - **Verify the landing** — open the posted comment (or `gh api` its body) and
   confirm every image loads; a wrong SHA, a private-repo host the reviewer cannot
   read, or a comment over GitHub's size limit all "succeed" silently.

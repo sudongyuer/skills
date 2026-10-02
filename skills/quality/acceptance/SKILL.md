@@ -204,9 +204,11 @@ PR:       https://github.com/<owner>/<repo>/pull/<n>#issuecomment-<id>
 ```
 
 **When a PR exists, the report goes on the PR** — the reviewer decides there,
-not in your terminal. Upload the evidence so it renders for them, generate the
-body with remote links (`pr-body --asset-base <url>`), and post it with
-`gh pr comment --body-file` (or a marked section via `gh pr edit --body-file`).
+not in your terminal. Upload the evidence so it renders for them: with
+`gh` 2.99.0 or newer, post the round-relative body (`pr-body`) with
+`gh pr comment --body-file … --attach <file>` for every file `pr-assets` lists;
+otherwise push the assets to the evidence branch and post a body with remote
+links (`pr-body --asset-base <url>`).
 The PR text and the chat reply carry **no local paths, `file://` links, or
 inline images**; every image and video in the PR resolves to an uploaded URL.
 Pushing evidence anywhere is a remote write — get the user's go-ahead first.

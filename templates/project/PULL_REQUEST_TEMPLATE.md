@@ -26,14 +26,19 @@ UI evidence is required for anything a person sees or touches (layout, motion,
 navigation, sheets, lists, inputs, icons, color, layout-changing copy):
 - Add or update a UI check, run it in light and dark with video.
 - Every screenshot and video must resolve to a URL the reviewer can open. Upload
-  them the way the `acceptance` skill describes ("Attaching to a pull request"):
-  push the files to the never-merged `acceptance-evidence` branch with a throwaway
-  index, then link them by commit SHA:
-  `https://github.com/<owner>/<repo>/raw/<sha>/<path>`. Ask the author before the
-  first push to that branch.
-- Reference every screenshot as `![<appearance> <case> <name>](<url>)` and every
-  video as `[<appearance> <case> run.mp4](<url>)` (videos open as links; they do
-  not play inline). A local path, a CI log or a prose description does not count.
+  them as the `acceptance` skill describes ("Attaching to a pull request"):
+  - `gh` 2.99.0 or newer: reference each file by its relative path in the body and
+    pass the same path to `--attach` on `gh pr create` / `gh pr edit` /
+    `gh pr comment`; `gh` rewrites the references to uploaded URLs (up to 50 files
+    per command; videos render as a player).
+  - Older `gh`: push the files to the never-merged `acceptance-evidence` branch
+    and link them by commit SHA,
+    `https://github.com/<owner>/<repo>/raw/<sha>/<path>`. Ask the author before
+    the first push to that branch.
+- Reference every screenshot as `![<appearance> <case> <name>](<path or url>)` and
+  every video as `[<appearance> <case> run.mp4](<path or url>)`. After posting,
+  open the PR and confirm every image and video loads. A local path left in the
+  final body, a CI log or a prose description does not count.
 - Do not commit the artifacts directory to the PR branch.
 
 Spec: if this change implements a spec, run spec-lifecycle first and link the spec.
@@ -54,15 +59,15 @@ changed, and say why in the summary. -->
 
 ### light / <case>
 
-![light <case> <capture>](<url>)
+![light <case> <capture>](<path or url>)
 
-[light <case> run.mp4](<url>)
+[light <case> run.mp4](<path or url>)
 
 ### dark / <case>
 
-![dark <case> <capture>](<url>)
+![dark <case> <capture>](<path or url>)
 
-[dark <case> run.mp4](<url>)
+[dark <case> run.mp4](<path or url>)
 
 ## Test
 
@@ -70,7 +75,7 @@ changed, and say why in the summary. -->
 - [ ] `<tests>`
 - [ ] `<bundle / build>`
 - [ ] UI checks (light and dark, video) for: <cases>
-- [ ] Every screenshot and video above links to the evidence branch by commit SHA
+- [ ] Every screenshot and video above loads on the PR (uploaded with `--attach`, or linked from the evidence branch)
 - [ ] Spec Implementation Record appended (`spec-lifecycle`) and `check-specs` passes
 
 Acceptance: <!-- acceptance round path / report, or why none is needed -->
