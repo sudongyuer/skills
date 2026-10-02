@@ -5,8 +5,8 @@
 ## 安装
 
 ```bash
-git clone https://github.com/sudongyuer/skills.git ~/git/skills
-cd ~/git/skills
+git clone https://github.com/sudongyuer/skills.git ~/work/skills
+cd ~/work/skills
 ./install.sh            # 把每个 skill 软链接到 ~/.claude/skills 和 ~/.agents/skills
 ./install.sh --dry-run  # 只打印将要做什么
 ```
@@ -17,7 +17,7 @@ cd ~/git/skills
 
 ```bash
 mkdir -p ~/.config/skills
-echo '{ "skill_repo_dir": "~/git/skills" }' > ~/.config/skills/config.json
+echo '{ "skill_repo_dir": "~/work/skills" }' > ~/.config/skills/config.json
 ```
 
 ## 目录
