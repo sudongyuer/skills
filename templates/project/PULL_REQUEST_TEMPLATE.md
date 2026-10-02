@@ -25,11 +25,16 @@ When the "AI" section stays, fill all fields:
 UI evidence is required for anything a person sees or touches (layout, motion,
 navigation, sheets, lists, inputs, icons, color, layout-changing copy):
 - Add or update a UI check, run it in light and dark with video.
-- Reference every screenshot as `![<appearance> <case> <name>](<path>)` and every
-  video as `[<appearance> <case> run.mp4](<path>)`, then upload them as attachments
-  (e.g. `gh pr create/edit --attach <path>` on a gh version that supports it).
-  A local path, a CI log or a prose description does not count.
-- Do not commit the artifacts directory.
+- Every screenshot and video must resolve to a URL the reviewer can open. Upload
+  them the way the `acceptance` skill describes ("Attaching to a pull request"):
+  push the files to the never-merged `acceptance-evidence` branch with a throwaway
+  index, then link them by commit SHA:
+  `https://github.com/<owner>/<repo>/raw/<sha>/<path>`. Ask the author before the
+  first push to that branch.
+- Reference every screenshot as `![<appearance> <case> <name>](<url>)` and every
+  video as `[<appearance> <case> run.mp4](<url>)` (videos open as links; they do
+  not play inline). A local path, a CI log or a prose description does not count.
+- Do not commit the artifacts directory to the PR branch.
 
 Spec: if this change implements a spec, run spec-lifecycle first and link the spec.
 Delete checklist lines that do not apply and say why a usual gate was skipped.
@@ -49,15 +54,15 @@ changed, and say why in the summary. -->
 
 ### light / <case>
 
-![light <case> <capture>](<path>)
+![light <case> <capture>](<url>)
 
-[light <case> run.mp4](<path>)
+[light <case> run.mp4](<url>)
 
 ### dark / <case>
 
-![dark <case> <capture>](<path>)
+![dark <case> <capture>](<url>)
 
-[dark <case> run.mp4](<path>)
+[dark <case> run.mp4](<url>)
 
 ## Test
 
@@ -65,7 +70,7 @@ changed, and say why in the summary. -->
 - [ ] `<tests>`
 - [ ] `<bundle / build>`
 - [ ] UI checks (light and dark, video) for: <cases>
-- [ ] Every screenshot and video above is attached
+- [ ] Every screenshot and video above links to the evidence branch by commit SHA
 - [ ] Spec Implementation Record appended (`spec-lifecycle`) and `check-specs` passes
 
 Acceptance: <!-- acceptance round path / report, or why none is needed -->
