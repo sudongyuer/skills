@@ -43,6 +43,7 @@ scripts/validate.mjs             仓库校验（CI 也跑这个）
 | [`prompting-playbook`](skills/workflow/prompting-playbook/SKILL.md) | 只写约束的启动指令、编号方案、先讨论后实现、审阅反馈与自检循环 |
 | [`session-handoff`](skills/workflow/session-handoff/SKILL.md) | 为另一个 agent 或新会话生成可直接接手的交接说明 |
 | [`session-to-skill`](skills/workflow/session-to-skill/SKILL.md) | 把一次完成的会话分类沉淀为 skill、项目文档或全局规则 |
+| [`start-mobile-app`](skills/workflow/start-mobile-app/SKILL.md) | 开一个新的 iOS App：采访 → 可行性 → 只写约束的初始化 → 设计语言 → CI 和 TestFlight → 离线界面验证 → 第一个功能，四个关卡等你拍板，进度记在 docs/KICKOFF.md |
 
 ### Quality
 
