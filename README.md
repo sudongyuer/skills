@@ -73,6 +73,7 @@ scripts/validate.mjs             仓库校验（CI 也跑这个）
 | ----- | ---- |
 | [`design-system`](skills/design/design-system/SKILL.md) | 设计系统骨架：任务分流、速查表、禁用写法、token 检查脚本、mockup 模板 |
 | [`generate-design-md`](skills/design/generate-design-md/SKILL.md) | 分析一个品牌或网站的视觉体系，生成 DESIGN.md |
+| [`replicate-interaction-from-video`](skills/design/replicate-interaction-from-video/SKILL.md) | 照着录屏复刻交互动效：逐帧取样、状态表、假数据驱动、逐帧步进截图、几何与逐字曲线拟合、对比到误差达标 |
 
 ### Research
 
