@@ -162,6 +162,18 @@ other app on the device.
   `animationMatchesGesture: true`, so the back swipe runs the same transition
   in reverse instead of the default push.
 
+**Android notes** (apply only when the project ships Android):
+
+- `animation: 'slide_from_right'` is Android-only; iOS ignores it and uses
+  the default push.
+- Android honours at most three `sheetAllowedDetents`; values past the third
+  are ignored. Design sheets for three detents if both platforms ship.
+- `sheetGrabberVisible` is iOS-only. Android shows no grabber, so do not rely
+  on it as the only sign that a sheet can be dragged.
+- `formSheet` on Android uses a Material bottom sheet that does not support
+  nested stacks. Keep the sheet a single screen, or use `presentation: 'modal'`
+  when it needs its own navigation.
+
 ---
 
 ## List entrances

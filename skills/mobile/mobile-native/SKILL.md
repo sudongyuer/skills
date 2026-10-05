@@ -59,13 +59,13 @@ Touch has no hover, so browsers fake one: the first tap on an element applies `:
 }
 ```
 
-Both conditions matter. `(hover: hover)` means the primary input can hover. `(pointer: fine)` means it's precise, like a mouse — it rules out styluses and touch devices that misreport hover support. In Tailwind v4 the `hover:` variant already compiles to `@media (hover: hover)`; in v3 set `future.hoverOnlyWhenSupported`.
+Both conditions matter. `(hover: hover)` means the primary input can hover. `(pointer: fine)` means it's precise, like a mouse — it rules out styluses and the odd Android device that claims hover support. In Tailwind v4 the `hover:` variant already compiles to `@media (hover: hover)`; in v3 set `future.hoverOnlyWhenSupported`.
 
 Touch users still need press feedback. Give it to them through `:active` (see §5), which works on every input type.
 
 ### 2. Gray/blue flash on tap
 
-Mobile browsers, iOS Safari included, paint a translucent highlight over any tapped element that has a click handler. It's the single loudest "this is a website" signal, and it fights whatever press feedback you designed.
+iOS Safari and Android Chrome paint a translucent highlight over any tapped element that has a click handler. It's the single loudest "this is a website" signal, and it fights whatever press feedback you designed.
 
 ```css
 html {
@@ -139,7 +139,7 @@ Keep press feedback within the press budget in [motion-standards](../../design/e
 
 ### 6. Pull-to-refresh hijacks scroll
 
-Scrolling past the top of the page triggers the browser's pull-to-refresh and the whole-page rubber band in iOS Safari. Fine on a document. Wrong in an app with its own scroll containers, a drawer the user drags down, or a canvas.
+Scrolling past the top of the page triggers pull-to-refresh on Android Chrome and the whole-page rubber band in iOS Safari. Fine on a document. Wrong in an app with its own scroll containers, a drawer the user drags down, or a canvas.
 
 ```css
 html, body {
@@ -235,7 +235,7 @@ Match the value to the color at the very top of your page — the header backgro
 Nothing above reproduces in device emulation. Sticky hover, the tap highlight, the URL bar's effect on `vh`, input zoom, the click delay, overscroll, safe areas, the software keyboard — every one is a real-hardware behavior.
 
 - Connect the phone over USB, run the dev server on `0.0.0.0`, open it by the machine's LAN IP.
-- iOS: Safari → Develop → the device.
+- iOS: Safari → Develop → the device. Android: `chrome://inspect`.
 - Test on a phone that's a few years old, not the newest one on your desk. Test with the keyboard open. Test in landscape once.
 - Test as an installed PWA if that's a target; standalone mode changes viewport, safe areas, and status bar behavior.
 
@@ -246,7 +246,7 @@ The Xcode Simulator is a step up from emulation but still misses touch feel. Rea
 When starting a mobile-facing app, this is the floor. Ship it before the first component:
 
 ```html
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a0a" />
 ```
@@ -277,7 +277,7 @@ button, a, [role="button"] {
 
 All `:hover` rules live inside that media query. `-webkit-text-size-adjust: 100%` stops font inflation in landscape.
 
-Drop `overscroll-behavior: none` from `html` if the app is a scrolling document where pull-to-refresh is welcome.
+`interactive-widget=resizes-content` makes the software keyboard shrink the layout viewport on Android Chrome, so `100dvh` and bottom-pinned inputs react to it the way they do on iOS. Drop `overscroll-behavior: none` from `html` if the app is a scrolling document where pull-to-refresh is welcome.
 
 ## Never Ship
 

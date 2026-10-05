@@ -1,6 +1,6 @@
 ---
 name: animate-expo
-description: Build animations in React Native and Expo (iOS), deciding in the order that determines whether they feel right — should it animate, which platform component already does it, which thread, which properties, spring or timing, how the gesture hands off, how it degrades under Reduce Motion — then offering numbered motion options and implementing the one the user picks with Reanimated, Gesture Handler, Expo Router and expo-haptics. Use when animating anything in an Expo app, adding gestures, sheets, screen transitions, press feedback or haptics, or fixing motion that stutters on device ("Expo 动效", "RN 动画", "手势", "sheet 动画", "触感反馈", "动画卡顿"). For web animation use `animate`; for Apple's motion principles and acceptance criteria use `apple-design`; for reviewing a motion diff use `review-animations`; for finding places to animate use `find-animation-opportunities`; for general motion judgment use `emil-design-eng`.
+description: Build animations in React Native and Expo (iOS first, with Android notes labelled), deciding in the order that determines whether they feel right — should it animate, which platform component already does it, which thread, which properties, spring or timing, how the gesture hands off, how it degrades under Reduce Motion — then offering numbered motion options and implementing the one the user picks with Reanimated, Gesture Handler, Expo Router and expo-haptics. Use when animating anything in an Expo app, adding gestures, sheets, screen transitions, press feedback or haptics, or fixing motion that stutters on device ("Expo 动效", "RN 动画", "手势", "sheet 动画", "触感反馈", "动画卡顿"). For web animation use `animate`; for Apple's motion principles and acceptance criteria use `apple-design`; for reviewing a motion diff use `review-animations`; for finding places to animate use `find-animation-opportunities`; for general motion judgment use `emil-design-eng`.
 ---
 
 # Building Animations in Expo
@@ -43,7 +43,8 @@ Two failure modes, and the first is worse:
    lines of code sometimes.
 2. **Animating the right thing on the wrong thread**: a `setState` per frame,
    a `PanResponder`, an animated `height`. It looks fine in dev on a new phone
-   and drops frames on the oldest supported iPhone.
+   and drops frames on the oldest supported iPhone (on Android, a
+   three-year-old mid-range phone).
 
 ## Gate
 
@@ -69,8 +70,9 @@ Stop with no code when any of these holds, and say why:
    none is approximated from memory.
 4. Reduced motion ships with the animation, gated manually where Reanimated
    does not honour it (step 9).
-5. Feel is judged on a Release build on the oldest supported iPhone. Nothing
-   else counts as verified.
+5. Feel is judged on a Release build on the oldest supported device (the
+   oldest supported iPhone; on Android, a mid-range phone). Nothing else
+   counts as verified.
 6. Motion choices are offered as numbered options; technical defects (wrong
    thread, layout properties, `scale(0)`, missing reduced motion, a gesture
    that cannot be interrupted) are fixed, not offered.
@@ -151,7 +153,10 @@ the run ends with its configuration.
 - `transform` is an array and order matters: `[{ translateY }, { scale }]`
   scales after moving. Keep translate first.
 - Materials (blur) come from the platform or the project's kit. Never animate
-  blur intensity; crossfade the opacity of a static material view.
+  blur intensity; crossfade the opacity of a static material view. **Android:**
+  `BlurView` re-renders the blur every frame while its intensity animates.
+- **Android:** shadows are `elevation`, and animating `elevation` re-renders the
+  shadow every frame. Animate the opacity of a pre-shadowed layer instead.
 - Percentages work in `translate` and are relative to the element's own size.
 
 **Completion criterion:** every animated property is `transform` or `opacity`,
@@ -241,8 +246,12 @@ recommendation.
   leave them alone. For a custom pressable, `scale: 0.97` in 100–160ms through
   a CSS transition is one option, not a mandate; an opacity or background
   change is another.
-- 44×44pt minimum touch target. If the visual is smaller, add `hitSlop`.
+- 44×44pt minimum touch target (**Android:** 48dp). If the visual is smaller,
+  add `hitSlop`.
 - `pressRetentionOffset` so a drifting finger does not cancel a press.
+- **Android:** use the ripple only in a Material-styled app. In a custom-designed
+  app, the same press treatment on both platforms is more coherent than a ripple
+  on one.
 
 ### 8. Haptics
 
@@ -261,7 +270,8 @@ them. Custom haptics are for custom interactions only:
   ends.
 - One per user action; never on scroll, per frame, or on an entrance the user
   did not cause.
-- Never the only feedback; many people turn system haptics off.
+- Never the only feedback; many people turn system haptics off. **Android:**
+  haptic hardware varies widely and is weak or absent on many devices.
 - From a worklet: `scheduleOnRN(Haptics.selectionAsync)`.
 
 ### 9. Reduced motion and accessibility
@@ -336,7 +346,8 @@ Stop and wait for the pick. After implementing:
 - **Ingredients**: tool, properties, config, thread, reduced-motion path.
 - **Feel-check on device**: what to try on a Release build (flick it,
   interrupt it mid-flight, reverse it, turn on Reduce Motion, turn haptics
-  off).
+  off), and on Android the slowest supported phone when the project ships
+  Android.
 
 ## Invocation variants
 
@@ -360,7 +371,7 @@ Stop and wait for the pick. After implementing:
 | Reading or writing a shared value during render | `.get()` / `.set()` in worklets, handlers, effects |
 | Core `Animated` for anything a finger touches | Reanimated |
 | Animating `height` / `width` / `margin` / `flex` / `top` | `transform` + `opacity` (absolute, childless elements exempt) |
-| Animating blur intensity | crossfade a static material view |
+| Animating blur intensity or Android `elevation` | crossfade a static layer |
 | `entering` on a virtualized list row | animate the container, or `itemLayoutAnimation` |
 | A screen transition rebuilt in JS | the native stack's default push |
 | Any transition between tabs | NativeTabs as is |

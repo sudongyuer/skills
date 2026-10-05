@@ -108,6 +108,7 @@ Output:
 - **Swipe to dismiss** — Dragging an element off-screen to close it, like a drawer or toast.
 - **Rubber-banding** — Resistance and snap-back when you drag past a boundary (the iOS overscroll feel).
 - **Shake / Wiggle** — A quick side-to-side jitter signaling an error or rejected input.
+- **Ripple** — A circle expanding from the point of a tap, confirming the press. The Android / Material press effect.
 
 ### Easing — how speed changes over an animation
 - **Easing** — The rate at which an animation speeds up or slows down.
