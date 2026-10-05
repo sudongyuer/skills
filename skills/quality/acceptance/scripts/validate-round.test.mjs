@@ -342,6 +342,18 @@ describe('CLI', () => {
     assert.match(assets.stderr, /not attachable with gh --attach .*: assets\/export\.txt/);
   });
 
+  test('runs when invoked through a symlinked skill directory', () => {
+    const link = path.join(root, 'linked-scripts');
+    fs.symlinkSync(path.dirname(SCRIPT), link);
+    const dir = newRound(path.join(root, '.acceptance'), 'note-export');
+    writeResult(dir, 1, [exportCase(dir)]);
+    const run = spawnSync(process.execPath, [path.join(link, 'validate-round.mjs'), 'check', dir], {
+      encoding: 'utf8',
+    });
+    assert.equal(run.status, 0, run.stderr);
+    assert.match(run.stdout, /Coverage: 1\/1 cases/);
+  });
+
   test('new prints the allocated directory under --root', () => {
     const res = spawnSync(process.execPath, [SCRIPT, 'new', 'note-export', '--root', path.join(root, '.acceptance')], {
       encoding: 'utf8',

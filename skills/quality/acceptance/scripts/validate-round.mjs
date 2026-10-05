@@ -596,6 +596,16 @@ function main(argv) {
   }
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+// Skills are usually reached through a symlinked directory; compare real paths
+// or the CLI silently does nothing when invoked through the link.
+const isEntryPoint = () => {
+  try {
+    return fs.realpathSync(process.argv[1]) === fs.realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+};
+
+if (process.argv[1] && isEntryPoint()) {
   process.exitCode = main(process.argv.slice(2));
 }

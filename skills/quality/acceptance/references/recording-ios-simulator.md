@@ -74,3 +74,32 @@ Accessibility/postcondition evidence from
 Tag the direct recording with provenance `cli` and deterministic frame/contact-sheet
 transforms with `program`. Cite them using the shared contract in
 [evidence.md](./evidence.md).
+
+## Measure motion along one scanline
+
+Use this to prove that an element did or did not move (a shake, a jump, a
+re-layout) when no image library is installed. Pick a row that crosses the
+element's edge against a contrasting background, decode only that row as
+grayscale, and print the edge position per frame:
+
+```bash
+# Scale to points so coordinates match the accessibility tree (402x874 on an
+# iPhone 17 Pro), then keep a single 1-pixel row at y=600.
+ffmpeg -v error -ss "$START" -i $DIR/assets/ios-flow.mp4 \
+  -vf "fps=30,scale=402:874,crop=402:1:0:600,format=gray" -f rawvideo $DIR/row.raw
+
+python3 - "$DIR/row.raw" "$START" > $DIR/assets/edge-trace.txt <<'PY'
+import sys
+data, start, width = open(sys.argv[1], 'rb').read(), float(sys.argv[2]), 402
+for i in range(len(data) // width):
+    row = data[i * width:(i + 1) * width]
+    edge = next((x for x in range(2, 80) if row[x] >= 253), None)  # first white-card pixel
+    print(f"t={start + i / 30:.2f}s edge={edge}")
+PY
+```
+
+A stable element prints one constant `edge` after it appears; a shake shows the
+edge stepping by its amplitude for a few frames. Attach the trace as `text`
+evidence alongside a frame. Tune the row, the scanned range, and the threshold
+to the element; confirm on one frame first that the threshold separates the
+element from its background.
