@@ -57,6 +57,7 @@ scripts/validate.mjs             仓库校验（CI 也跑这个）
 | [`find-animation-opportunities`](skills/quality/find-animation-opportunities/SKILL.md) | 找出真正值得加动效的地方，同时列出被否决的候选和理由 |
 | [`improve-animations`](skills/quality/improve-animations/SKILL.md) | 全库动效体检：问题清单，选中后写成可交给其他 agent 执行的计划 |
 | [`ios-ui-verify`](skills/quality/ios-ui-verify/SKILL.md) | iOS 模拟器离线界面验证：验证模式、Debug 场景、AXe 脚本、浅色深色截图录屏 |
+| [`measure-iphone-interaction-hangs`](skills/quality/measure-iphone-interaction-hangs/SKILL.md) | 在 iPhone 真机 Release 包上用 xctrace 挂载进程，测一个交互的主线程卡顿时长，修复前后同脚本对比 |
 | [`react-rerender-audit`](skills/quality/react-rerender-audit/SKILL.md) | 从外部测量 React 重渲染，定位具体 hook，下放状态修复并用 Profiler 测试锁定 |
 | [`review-animations`](skills/quality/review-animations/SKILL.md) | 严格审查一处动效改动：缺陷直接标出，品味选择给编号方案（只能手动调用） |
 | [`spec-lifecycle`](skills/quality/spec-lifecycle/SKILL.md) | 设计文档状态管理、实现后回填实施记录、推翻时写取代文档、索引与校验脚本 |
