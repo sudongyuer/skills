@@ -1,44 +1,65 @@
 ---
 name: skill-name
-description: State precisely what the skill does, when it should be used, and what special workflow or domain knowledge it provides.
+description: State what the skill does, every trigger condition (including Chinese phrases the user is likely to type), and which neighbouring skill to use instead for adjacent requests.
 ---
 
 # Skill Title
 
-Use this skill when the task requires a repeatable workflow that benefits from stable procedural guidance rather than ad hoc reasoning.
+One paragraph: the outcome this skill produces and what it does not cover.
 
-## Scope
+## Operating posture
 
-- Define the target task class.
-- State the expected environment or prerequisites.
-- State what this skill does not cover.
+The stance in two or three sentences. Then the two failure modes, worst first:
 
-## Inputs
+1. <The worse failure.>
+2. <The lesser failure.>
 
-| Variable | Meaning |
-|---|---|
-| `INPUT_NAME` | Explain the required input |
+## Gate
+
+Questions that can end the run with no output. Saying "this should not be done" is a valid result.
+
+## Hard rules
+
+1. <Testable rule.>
+2. <Testable rule.>
 
 ## Workflow
 
-```text
-[1] Gather context
-      -> identify required inputs and constraints
+### Phase 1 — <name>
 
-[2] Execute the core procedure
-      -> apply the domain-specific method
+<Steps.>
 
-[3] Validate the result
-      -> confirm correctness before reporting completion
-```
+**Completion criterion:** <when this phase is done>.
 
-## Rules
+### Phase 2 — <name>
 
-- Keep instructions concise.
-- Prefer deterministic commands for fragile steps.
-- Move large reference material into `references/` when necessary.
-- Do not embed secrets or machine-specific credentials.
+<Steps.>
+
+**Completion criterion:** <when this phase is done>.
+
+## Required output format
+
+| # | Severity | Location | Finding | Fix |
+| --- | --- | --- | --- | --- |
+| 1 | <level> | `path:line` | <what is wrong> | <change> |
+
+**Decisions for you:** choices with more than one right answer, as numbered options with a recommendation.
+
+**What held up:** what was checked and passed.
+
+## Invocation variants
+
+| Invocation | Behavior |
+| --- | --- |
+| `<target>` | Full workflow, then stop |
+| `fix all` / `fix 1, 3` | Apply the named findings and re-verify |
+
+## Never ship
+
+| Never | Instead |
+| --- | --- |
+| <anti-pattern> | <replacement> |
 
 ## Verification
 
-- State the minimum read-only or non-destructive checks that should be run before completion.
+- <Read-only or non-destructive checks to run before reporting completion.>

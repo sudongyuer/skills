@@ -44,8 +44,15 @@ test('frontmatter must hold only a matching name and a description', () => {
   readme({ Workflow: ['workflow/alpha', 'workflow/gamma'] });
   const out = messages();
   assert.ok(out.includes('skills/workflow/alpha/SKILL.md: frontmatter name "beta" must equal "alpha"'));
-  assert.ok(out.includes('skills/workflow/alpha/SKILL.md: frontmatter may only contain name, description, argument-hint (found metadata)'));
+  assert.ok(out.includes('skills/workflow/alpha/SKILL.md: frontmatter may only contain name, description, argument-hint, disable-model-invocation (found metadata)'));
   assert.ok(out.includes('skills/workflow/gamma/SKILL.md: frontmatter description is empty'));
+});
+
+test('disable-model-invocation is allowed only as true', () => {
+  skill('quality', 'manual', 'name: manual\ndescription: x\ndisable-model-invocation: true');
+  skill('quality', 'wrong', 'name: wrong\ndescription: x\ndisable-model-invocation: yes');
+  readme({ Quality: ['quality/manual', 'quality/wrong'] });
+  assert.deepEqual(messages(), ['skills/quality/wrong/SKILL.md: frontmatter disable-model-invocation must be true when present']);
 });
 
 test('README rows must exist once, under the right domain, for real skills', () => {

@@ -278,6 +278,6 @@ describe('cli', () => {
       project({}),
     );
     assert.equal(result.code, 0, result.lines.join('\n'));
-    assert.match(result.lines.at(-1), /65 documented tokens in sync; 9 file\(s\) scanned clean/);
+    assert.match(result.lines.at(-1), /67 documented tokens in sync; 9 file\(s\) scanned clean/);
   });
 });

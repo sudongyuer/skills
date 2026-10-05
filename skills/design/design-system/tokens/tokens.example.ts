@@ -76,8 +76,10 @@ export const vars = {
   '--duration-press': 100,
   '--duration-fade': 150,
   '--duration-settle': 200,
-  '--duration-glide': 320,
-  '--ease-standard': 'cubic-bezier(0.2, 0, 0, 1)',
+  '--duration-glide': 280,
+  '--ease-enter': 'cubic-bezier(0.23, 1, 0.32, 1)',
+  '--ease-move': 'cubic-bezier(0.77, 0, 0.175, 1)',
+  '--ease-linear': 'linear',
 
   '--z-base': 0,
   '--z-sticky': 100,

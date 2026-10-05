@@ -162,17 +162,21 @@ sit one step apart side by side.
 | `--shadow-whisper` | `0 4px 24px #0000000d` | The only shadow: floating surfaces |
 | `--blur-overlay`   | `24px`                 | Backdrop blur behind overlays      |
 
-## Motion: durations named by intent (EXAMPLE)
+## Motion: named by intent (EXAMPLE)
 
-| Token               | Value                       | Intent                                   |
-| ------------------- | --------------------------- | ---------------------------------------- |
-| `--duration-press`  | `100ms`                     | Press feedback (scale/sink, not flicker) |
-| `--duration-fade`   | `150ms`                     | Content appearing after load             |
-| `--duration-settle` | `200ms`                     | Small state change settling in place     |
-| `--duration-glide`  | `320ms`                     | Sheets, drawers, page transitions        |
-| `--ease-standard`   | `cubic-bezier(0.2, 0, 0, 1)` | Default easing for all of the above     |
+| Token               | Value                            | Intent                                       |
+| ------------------- | -------------------------------- | -------------------------------------------- |
+| `--duration-press`  | `100ms`                          | Press feedback (scale/sink, not flicker)     |
+| `--duration-fade`   | `150ms`                          | Opacity/color cross-fades; reduced-motion substitute |
+| `--duration-settle` | `200ms`                          | Small movement settling in place             |
+| `--duration-glide`  | `280ms`                          | Sheets, drawers, page transitions (≤ 300ms)  |
+| `--ease-enter`      | `cubic-bezier(0.23, 1, 0.32, 1)` | Entering, exiting, responses to input        |
+| `--ease-move`       | `cubic-bezier(0.77, 0, 0.175, 1)` | On-screen movement from A to B              |
+| `--ease-linear`     | `linear`                         | Spinners, progress, hold-to-confirm fills    |
 
-Respect reduced-motion: durations collapse to 0 (see the example CSS).
+Reduced motion: movement durations go to 0 and movement is replaced by a fade;
+`--duration-fade` stays (see the example CSS). Values and reasoning:
+[motion-standards](../emil-design-eng/references/motion-standards.md).
 
 ## Z-index layers (EXAMPLE)
 

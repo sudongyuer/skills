@@ -1,47 +1,69 @@
 ---
 name: skill-name
-description: State precisely what the skill does, when it should be used, and what bundled references should be consulted.
+description: State what the skill does, every trigger condition (including Chinese phrases the user is likely to type), which bundled references it loads, and which neighbouring skill to use instead for adjacent requests.
 ---
 
 # Skill Title
 
-Use this skill when the task requires a repeatable workflow plus a small amount of domain reference material.
+One paragraph: the outcome this skill produces and what it does not cover.
 
-## Scope
+## Operating posture
 
-- Define the target task class.
-- State the expected environment or prerequisites.
-- State which details live in `references/`.
+The stance in two or three sentences. Then the two failure modes, worst first:
 
-## Inputs
+1. <The worse failure.>
+2. <The lesser failure.>
 
-| Variable | Meaning |
-|---|---|
-| `INPUT_NAME` | Explain the required input |
+## Gate
+
+Questions that can end the run with no output. Saying "this should not be done" is a valid result.
+
+## Hard rules
+
+1. <Testable rule.>
+2. <Testable rule.>
 
 ## Workflow
 
-```text
-[1] Gather context
-      -> identify required inputs and constraints
+### Phase 1 — <name>
 
-[2] Read the necessary reference file
-      -> load only the relevant file from references/
+<Steps. Load `references/domain.md` here, and say why.>
 
-[3] Execute the core procedure
-      -> apply the domain-specific method
+**Completion criterion:** <when this phase is done>.
 
-[4] Validate the result
-      -> confirm correctness before reporting completion
-```
+### Phase 2 — <name>
+
+<Steps.>
+
+**Completion criterion:** <when this phase is done>.
 
 ## References
 
-- `references/domain.md`: Explain when this file should be read.
+- `references/domain.md`: <what it holds and when to load it>. Shared standards owned by another skill are linked, not copied.
 
-## Rules
+## Required output format
 
-- Keep the main skill concise.
-- Move long schemas, policies, or examples into `references/`.
-- Do not duplicate large blocks between `SKILL.md` and `references/`.
-- Do not embed secrets or machine-specific credentials.
+| # | Severity | Location | Finding | Fix |
+| --- | --- | --- | --- | --- |
+| 1 | <level> | `path:line` | <what is wrong> | <change> |
+
+**Decisions for you:** choices with more than one right answer, as numbered options with a recommendation.
+
+**What held up:** what was checked and passed.
+
+## Invocation variants
+
+| Invocation | Behavior |
+| --- | --- |
+| `<target>` | Full workflow, then stop |
+| `fix all` / `fix 1, 3` | Apply the named findings and re-verify |
+
+## Never ship
+
+| Never | Instead |
+| --- | --- |
+| <anti-pattern> | <replacement> |
+
+## Verification
+
+- <Read-only or non-destructive checks to run before reporting completion.>
