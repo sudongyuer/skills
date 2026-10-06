@@ -70,7 +70,24 @@ python3 scripts/compare_curves.py ref-slide.csv rep-slide.csv --value x --normal
 ```
 
 Use `--normalize` when the replica's font differs: it compares the *shape*
-(timing, overshoot) and ignores the travel distance.
+(timing, overshoot) and ignores the travel distance. It refuses a curve whose
+first and last values are equal (a replica that never moved would otherwise
+read as a perfect match); compare such ranges without `--normalize`.
+
+### Frame rows
+
+`measure_bounds.py` writes a row for every frame, blank where the element was
+not found, and `compare_curves.py` requires matching `t` columns, so a replica
+whose element appears a few frames late is reported frame by frame ("not
+measured on both sides") instead of shifting every later row.
+
+```bash
+python3 scripts/frame_strip.py --a ref/x3 --b rep/x3 --a-box 190,92,810,212 --b-box 178,82,798,202 \
+  --frames 34:68:2 --fps 60 --first-frame 50 --out strip.png
+```
+
+`--first-frame` keeps the strip's timestamps equal to the other scripts' for
+sequences that start mid-recording (the 3x crops above start at frame 50).
 
 ## Validate the instrument before trusting a diff
 
@@ -85,6 +102,7 @@ Every one of these produced a confident, wrong diff in practice:
 | A +16 px jump when nothing changed | an adjacent element (typing dots) within `--run` px of the edge | match the real gap, or raise `--run` |
 | Spring damping comes out anywhere between 1.0 and 1.5 | fit model that ignores ζ when overdamped | `fit_spring.py` models all three regimes; keep its tests green |
 | A width fit with 0 ms rise and a huge RMS | scan column outside the element on early frames | choose a column inside the element from frame 0 |
+| `--normalize` comparison passes although the replica is broken | normalising a curve with no net change divides by zero | the script now refuses it; compare that range unnormalised |
 | Single-frame spikes on both curves at the same moment | the metric, not the motion | ignore; report as measurement artefact |
 
 Before using a metric, run it on one frame where you know the answer and look

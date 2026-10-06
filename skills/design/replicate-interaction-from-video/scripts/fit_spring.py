@@ -7,7 +7,8 @@ Each SEGMENT is name:start:end in seconds and should span one change from rest
 to rest.
 
 Prints, per segment: start time, SwiftUI-style response (2*pi/omega) and
-dampingFraction, normalised initial velocity v0 (distance-fractions per second),
+dampingFraction, normalised initial velocity v0 (distance-fractions per second; negative when the
+segment starts moving away from its target),
 10-90% rise time, and the fit's RMS error in the curve's units.
 """
 from __future__ import annotations
@@ -25,7 +26,8 @@ def load(path: str):
         rows = list(csv.DictReader(fh))
     if not rows:
         raise SystemExit(f'error: {path} has no rows')
-    return {k: np.array([float(r[k]) for r in rows]) for k in rows[0]}
+    # blank cells (a frame where the element was not found) become NaN so rows stay frame-aligned
+    return {k: np.array([float(r[k]) if r[k] != '' else np.nan for r in rows]) for k in rows[0]}
 
 
 def value(cols: dict, expr: str) -> np.ndarray:
@@ -48,9 +50,14 @@ def spring_step(t, t0, w, z, v0):
     return 1 + x
 
 
+MIN_SAMPLES = 8
+
+
 def fit_segment(t, y, a: float, b: float) -> dict:
-    m = (t >= a) & (t <= b)
+    m = (t >= a) & (t <= b) & np.isfinite(y)
     tt, yy = t[m], y[m]
+    if len(tt) < MIN_SAMPLES:
+        raise ValueError(f'segment {a}:{b} has {len(tt)} measured samples; need at least {MIN_SAMPLES}')
     y0, y1 = float(np.median(yy[:2])), float(np.median(yy[-5:]))
     if abs(y1 - y0) < 1e-9:
         raise ValueError('segment does not change')
@@ -58,7 +65,7 @@ def fit_segment(t, y, a: float, b: float) -> dict:
     best = None
     for z0 in (0.7, 0.9, 1.0):
         r = least_squares(lambda q: spring_step(tt, *q) - p, [tt[0], 20, z0, 0],
-                          bounds=([a - 0.2, 2, 0.3, 0], [b, 80, 1.5, 400]), loss='soft_l1', f_scale=0.05)
+                          bounds=([a - 0.2, 2, 0.3, -400], [b, 80, 1.5, 400]), loss='soft_l1', f_scale=0.05)
         if best is None or r.cost < best.cost:
             best = r
     t0, w, z, v0 = best.x
@@ -76,12 +83,18 @@ def main(argv=None) -> int:
     a = p.parse_args(argv)
     cols = load(a.csv)
     t, y = cols['t'], value(cols, a.value)
+    status = 0
     for seg in a.segments:
         name, s0, s1 = seg.split(':')
-        r = fit_segment(t, y, float(s0), float(s1))
+        try:
+            r = fit_segment(t, y, float(s0), float(s1))
+        except ValueError as e:
+            print(f'{name:12s} error: {e}', file=sys.stderr)
+            status = 1
+            continue
         print(f"{name:12s} {r['from_']:7.1f}->{r['to']:<7.1f} start={r['start']:.3f}s response={r['response']:.3f}s "
               f"damping={r['damping']:.2f} v0={r['v0']:5.1f}/s rise10-90={r['rise_ms']:4.0f}ms rms={r['rms']:.1f}")
-    return 0
+    return status
 
 
 if __name__ == '__main__':

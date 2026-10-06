@@ -7,6 +7,8 @@ blur/scale/opacity on a glyph, and a known sub-pixel shift.
 """
 from __future__ import annotations
 
+import contextlib
+import io
 import os
 import sys
 import tempfile
@@ -49,6 +51,26 @@ class MeasureBounds(unittest.TestCase):
         self.assertEqual((top, bottom), (50, 90))
         self.assertEqual(measure_bounds.measure(img, BG, col=60, y0=10)[:2], (50, 181))
 
+    def test_element_reaching_the_bottom_edge(self):
+        img = np.zeros((100, 50, 3), np.uint8) + np.array(BG, np.uint8)
+        img[60:, 5:45] = (252, 251, 249)
+        self.assertEqual(measure_bounds.measure(img, BG, col=20, y0=0)[:2], (60, 100))
+        img[95:] = BG  # fewer trailing background rows than --run
+        self.assertEqual(measure_bounds.measure(img, BG, col=20, y0=0)[:2], (60, 95))
+
+    def test_every_frame_gets_a_row(self):
+        with tempfile.TemporaryDirectory() as d:
+            for i in range(3):
+                img = np.zeros((80, 60, 3), np.uint8) + np.array(BG, np.uint8)
+                if i:  # the element appears from frame 1
+                    img[20:50, 5:55] = (252, 251, 249)
+                Image.fromarray(img).save(os.path.join(d, f'{i:04d}.png'))
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                measure_bounds.main([d, '--fps', '60', '--bg', ','.join(map(str, BG)), '--col', '30'])
+            lines = out.getvalue().strip().splitlines()
+            self.assertEqual(lines, ['t,top,bottom,right', '0.0000,,,', '0.0167,20,50,55', '0.0333,20,50,55'])
+
 
 class FitSpring(unittest.TestCase):
     def test_recovers_response_and_damping(self):
@@ -66,6 +88,25 @@ class FitSpring(unittest.TestCase):
         y = fit_spring.spring_step(t, 0.1, 2 * np.pi / 0.3, 1.4, 0.0)
         r = fit_spring.fit_segment(t, y, 0.0, 1.4)
         self.assertAlmostEqual(r['damping'], 1.4, delta=0.15)
+
+    def test_negative_initial_velocity(self):
+        # retargeted mid-flight: starts moving away from the new target
+        t = np.arange(0, 1.4, 1 / 60)
+        y = fit_spring.spring_step(t, 0.1, 2 * np.pi / 0.4, 0.9, -6.0)
+        r = fit_spring.fit_segment(t, y, 0.0, 1.3)
+        self.assertLess(r['v0'], -3)
+        self.assertAlmostEqual(r['response'], 0.4, delta=0.05)
+
+    def test_short_segment_is_refused(self):
+        t = np.arange(0, 1, 1 / 60)
+        with self.assertRaisesRegex(ValueError, 'need at least'):
+            fit_spring.fit_segment(t, t * 2, 0.5, 0.52)
+
+    def test_unmeasured_frames_are_skipped(self):
+        t = np.arange(0, 1.2, 1 / 60)
+        y = 100 + 50 * fit_spring.spring_step(t, 0.2, 2 * np.pi / 0.42, 1.0, 0.0)
+        y[30:33] = np.nan
+        self.assertAlmostEqual(fit_spring.fit_segment(t, y, 0.1, 1.1)['response'], 0.42, delta=0.04)
 
     def test_underdamped_overshoots(self):
         t = np.arange(0, 1.5, 1 / 60)
@@ -88,6 +129,23 @@ class CompareCurves(unittest.TestCase):
         d = compare_curves.errors(np.array([0, 5, 10.0]), np.array([0, 10, 20.0]), normalize=True)
         np.testing.assert_allclose(d, 0)
 
+    def test_normalize_refuses_a_flat_curve(self):
+        # a replica that never moves must not read as a perfect match
+        with self.assertRaisesRegex(ValueError, 'replica: first and last values are equal'):
+            compare_curves.errors(np.array([0, 5, 10.0]), np.array([3, 3, 3.0]), normalize=True)
+
+    def test_unmeasured_frames_stay_aligned(self):
+        d = compare_curves.errors(np.array([1, 2, 3, 4.0]), np.array([np.nan, 2, 3, 5.0]))
+        self.assertTrue(np.isnan(d[0]))
+        np.testing.assert_allclose(d[1:], [0, 0, 1])
+        self.assertEqual(compare_curves.summary(d)['max'], 1.0)
+
+    def test_mismatched_frames_are_refused(self):
+        with self.assertRaisesRegex(ValueError, 'frame counts differ'):
+            compare_curves.errors(np.zeros(3), np.zeros(4))
+        with self.assertRaisesRegex(ValueError, 't columns differ'):
+            compare_curves.check_times(np.array([0, 1 / 60]), np.array([0.1, 0.1 + 1 / 60]))
+
 
 class GlyphFit(unittest.TestCase):
     def test_recovers_blur_scale_alpha(self):
@@ -100,6 +158,21 @@ class GlyphFit(unittest.TestCase):
         self.assertAlmostEqual(r['alpha'], 0.5, delta=0.08)
         self.assertAlmostEqual(r['dy'], 6.0, delta=0.5)
         self.assertGreater(r['fit'], 0.95)
+
+    def test_empty_cell_does_not_abort(self):
+        g = np.full((120, 220), 250, np.uint8)
+        g[:, :120] = glyph_image()
+        # cells carry 14 px of padding each side, so keep the blank cell well clear of the glyph
+        res = glyph_fit.analyse([g, g], box=(20, 20, 200, 100), cells=[(20, 100), (150, 200)])
+        self.assertAlmostEqual(res[0][-1]['ink'], 1.0, places=5)
+        self.assertEqual(res[1], [])  # blank: no ink in the settled frame
+        self.assertIn('no ink', glyph_fit.summarize(res, 60, 0, 'R '))
+
+    def test_box_near_the_image_edge(self):
+        g = glyph_image()
+        res = glyph_fit.analyse([g, g], box=(0, 3, 120, 110), cells=[(0, 120)])
+        self.assertAlmostEqual(res[0][-1]['ink'], 1.0, places=5)
+        self.assertEqual(res[0][-1]['scale'], 1.0)
 
     def test_analyse_marks_settled_glyph(self):
         g = glyph_image()
@@ -121,6 +194,9 @@ class TrackTemplate(unittest.TestCase):
 
 
 class FrameStrip(unittest.TestCase):
+    def test_label_uses_first_frame(self):
+        self.assertEqual(frame_strip.label(0, 50, 60), '0.833s')
+
     def test_strip_size(self):
         with tempfile.TemporaryDirectory() as d:
             files = []

@@ -18,7 +18,11 @@ import sys
 from PIL import Image, ImageDraw
 
 
-def strip(a_files, b_files, a_box, b_box, indices, fps):
+def label(i: int, first_frame: int, fps: float) -> str:
+    return f'{(first_frame + i) / fps:.3f}s'
+
+
+def strip(a_files, b_files, a_box, b_box, indices, fps, first_frame=0):
     w = max(a_box[2] - a_box[0], b_box[2] - b_box[0])
     h = max(a_box[3] - a_box[1], b_box[3] - b_box[1])
     out = Image.new('RGB', (2 * w + 10, h * len(indices)), 'black')
@@ -26,7 +30,7 @@ def strip(a_files, b_files, a_box, b_box, indices, fps):
     for k, i in enumerate(indices):
         out.paste(Image.open(a_files[i]).convert('RGB').crop(a_box), (0, k * h))
         out.paste(Image.open(b_files[i]).convert('RGB').crop(b_box), (w + 10, k * h))
-        draw.text((2 * w + 10 - 70, k * h + 4), f'{i / fps:.3f}s', fill=(200, 0, 0))
+        draw.text((2 * w + 10 - 70, k * h + 4), label(i, first_frame, fps), fill=(200, 0, 0))
     return out
 
 
@@ -38,6 +42,7 @@ def main(argv=None) -> int:
     p.add_argument('--b-box', required=True)
     p.add_argument('--frames', required=True, help='start:end:step (file indices)')
     p.add_argument('--fps', type=float, required=True)
+    p.add_argument('--first-frame', type=int, default=0, help='frame number of the first file (for timestamps)')
     p.add_argument('--out', required=True)
     a = p.parse_args(argv)
     af = sorted(glob.glob(os.path.join(a.a, '*.png')))
@@ -48,7 +53,7 @@ def main(argv=None) -> int:
         print('error: no frames in range for both directories', file=sys.stderr)
         return 1
     box = lambda v: tuple(int(x) for x in v.split(','))
-    strip(af, bf, box(a.a_box), box(a.b_box), idx, a.fps).save(a.out)
+    strip(af, bf, box(a.a_box), box(a.b_box), idx, a.fps, a.first_frame).save(a.out)
     print(a.out)
     return 0
 

@@ -6,7 +6,9 @@ walks down one column (--col) to the first non-background pixel (top), keeps
 going until --run consecutive background pixels (bottom), then walks one row
 (top + --row-offset) to the right edge.
 
-Output CSV header: t,top,bottom,right   (t in seconds, from --fps)
+Output CSV header: t,top,bottom,right   (t in seconds, from --fps; bottom and
+right are exclusive). Every frame gets a row; a frame where no element is
+found has blank values, so rows stay paired by frame with another run.
 
 Choose --col inside the element's flat interior: not inside a rounded corner,
 not across an icon or chip whose colour is within --tol of the background.
@@ -33,13 +35,15 @@ def measure(img: np.ndarray, bg, col: int, y0: int, tol: int = 3, run: int = 12,
     top = next((y for y in range(y0, img.shape[0]) if not column[y]), None)
     if top is None:
         return None
-    y, streak = top, 0
-    while y < img.shape[0]:
-        streak = streak + 1 if column[y] else 0
-        if streak >= run:
-            break
-        y += 1
-    bottom = y - streak + 1
+    last, streak = top, 0
+    for y in range(top, img.shape[0]):
+        if column[y]:
+            streak += 1
+            if streak >= run:
+                break
+        else:
+            last, streak = y, 0
+    bottom = last + 1
     ry = min(top + row_offset, img.shape[0] - 1)
     row = is_bg(img[ry], bg, tol)
     w = img.shape[1]
@@ -67,8 +71,7 @@ def main(argv=None) -> int:
     print('t,top,bottom,right')
     for i, f in enumerate(files):
         m = measure(np.asarray(Image.open(f).convert('RGB')), bg, a.col, a.y0, a.tol, a.run, a.row_offset, a.x_start)
-        if m:
-            print(f'{i / a.fps:.4f},{m[0]},{m[1]},{m[2]}')
+        print(f'{i / a.fps:.4f},{m[0]},{m[1]},{m[2]}' if m else f'{i / a.fps:.4f},,,')
     return 0
 
 

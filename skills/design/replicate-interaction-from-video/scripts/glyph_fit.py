@@ -42,20 +42,27 @@ def centroid(m: np.ndarray):
     return float((ys * m).sum() / s), float((xs * m).sum() / s)
 
 
-def render(final, cf, sigma, s, cy, cx, shape):
+def warp(final, cf, s, cy, cx, shape):
+    """scale the settled glyph about its centroid cf by s and place that centroid at (cy, cx)"""
     M = np.float32([[s, 0, cx - s * cf[1]], [0, s, cy - s * cf[0]]])
-    out = cv2.warpAffine(final, M, (shape[1], shape[0]), flags=cv2.INTER_LINEAR)
-    if sigma > 0.05:
-        out = cv2.GaussianBlur(out, (0, 0), sigma)
-    return out
+    return cv2.warpAffine(final, M, (shape[1], shape[0]), flags=cv2.INTER_LINEAR)
 
 
-def fit_frame(I: np.ndarray, F: np.ndarray, cf, sigmas=np.arange(0, 9.01, 0.5), scales=np.arange(0.4, 1.151, 0.05)):
-    cc = centroid(I)
+def blur(img, sigma):
+    return cv2.GaussianBlur(img, (0, 0), sigma) if sigma > 0.05 else img
+
+
+def render(final, cf, sigma, s, cy, cx, shape):
+    return blur(warp(final, cf, s, cy, cx, shape), sigma)
+
+
+def fit_frame(I: np.ndarray, F: np.ndarray, cf, cc=None, sigmas=np.arange(0, 9.01, 0.5), scales=np.arange(0.4, 1.151, 0.05)):
+    cc = cc or centroid(I)
     best = None
-    for sigma in sigmas:
-        for s in scales:
-            R = render(F, cf, sigma, s, cc[0], cc[1], I.shape)
+    for s in scales:
+        W = warp(F, cf, s, cc[0], cc[1], I.shape)  # the warp depends on scale only; blur it per sigma
+        for sigma in sigmas:
+            R = blur(W, sigma)
             rr = float((R * R).sum())
             if rr < 1e-6:
                 continue
@@ -69,22 +76,29 @@ def fit_frame(I: np.ndarray, F: np.ndarray, cf, sigmas=np.arange(0, 9.01, 0.5), 
 
 
 def analyse(grays, box, cells, final_idx=-1, pad=14):
+    """Per-cell rows; a cell with no ink in the settled frame (a space) yields an empty list."""
     x0, y0, x1, y1 = box
-    crops = [g[y0 - pad:y1 + pad, x0 - pad:x1 + pad] for g in grays]
-    bg = float(np.median(crops[final_idx][:4, :]))
+    h, w = grays[final_idx].shape[:2]
+    ya, yb, xa, xb = max(0, y0 - pad), min(h, y1 + pad), max(0, x0 - pad), min(w, x1 + pad)  # clamp at image edges
+    crops = [g[ya:yb, xa:xb] for g in grays]
+    bg = float(np.median(crops[final_idx][:min(4, yb - ya), :]))
     out = []
     for gx0, gx1 in cells:
-        sl = slice(gx0 - x0, gx1 - x0 + 2 * pad)
+        sl = slice(max(0, gx0 - pad - xa), min(xb, gx1 + pad) - xa)
         F = ink(crops[final_idx][:, sl], bg)
         cf, total = centroid(F), float(F.sum())
+        if cf is None:
+            out.append([])
+            continue
         rows = []
         for t, c in enumerate(crops):
             I = ink(c[:, sl], bg)
             frac = float(I.sum()) / total
-            if frac < 0.02 or centroid(I) is None:
+            cc = centroid(I)
+            if frac < 0.02 or cc is None:
                 rows.append(dict(t=t, ink=frac, alpha=0.0, sigma=None, scale=None, dy=None, dx=None, fit=0.0))
             else:
-                rows.append(dict(t=t, ink=frac, **fit_frame(I, F, cf)))
+                rows.append(dict(t=t, ink=frac, **fit_frame(I, F, cf, cc)))
         out.append(rows)
     return out
 
@@ -93,13 +107,16 @@ def summarize(result, fps: float, first_frame: int, labels):
     lines = [f"{'glyph':6s} {'onset':>6s} {'50%':>6s} {'95%':>6s} {'dur':>5s} {'s0':>5s} {'dy0':>6s} {'sig0':>5s} {'a0':>5s} {'dyMin':>6s}"]
     T = lambda r: (first_frame + r['t']) / fps if r else float('nan')
     for gi, rows in enumerate(result):
+        label = labels[gi] if gi < len(labels) else str(gi)
+        if not rows:
+            lines.append(f'{label:6s} (no ink in the settled frame)')
+            continue
         on = next((r for r in rows if r['ink'] > 0.05), None)
         half = next((r for r in rows if r['ink'] > 0.5), None)
         done = next((r for r in rows if r['ink'] > 0.95), None)
         good = [r for r in rows if r['fit'] > 0.5]
         first = next((r for r in good if on and r['t'] >= on['t']), None)
         after = [r['dy'] for r in good if half and r['t'] >= half['t']]
-        label = labels[gi] if gi < len(labels) else str(gi)
         lines.append(f"{label:6s} {T(on):6.3f} {T(half):6.3f} {T(done):6.3f} {1000 * (T(done) - T(on)):5.0f} "
                      f"{(first or {}).get('scale') or 0:5.2f} {(first or {}).get('dy') or 0:6.1f} "
                      f"{(first or {}).get('sigma') or 0:5.1f} {(first or {}).get('alpha') or 0:5.2f} {min(after) if after else 0:6.1f}")
