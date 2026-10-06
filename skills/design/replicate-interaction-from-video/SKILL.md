@@ -143,7 +143,9 @@ the replica.
 ### 8. Report
 
 Give the user: the state table, the fitted parameters, each metric's error
-(median / p90 / max), the frame-aligned comparison (video or strip), and every
+(median / p90 / max), the frame-aligned comparison (a `frame_strip.py` image,
+and a side-by-side video built as in
+[references/capture.md](references/capture.md)), and every
 remaining gap with its cause. Name residuals honestly ("font not installed",
 "single-glyph overshoot not modelled", "only row 1 measured").
 
