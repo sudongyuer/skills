@@ -1,20 +1,13 @@
 ---
 name: capture-output-via-sidechannel
-description: Use when a runner, CI step, container, or orchestrator executes a task whose stdout/stderr you cannot retrieve afterwards — no log API, no shell access, output stream not captured, or logs evicted before you can read them. The pattern: have the task itself write its captured output into a data store you CAN read (SQL row, Redis key, mounted file, public webhook).
+description: Use when a runner, CI step, container, or orchestrator executes a task whose stdout/stderr you cannot retrieve afterwards — no log API, no shell access, output stream not captured, or logs evicted before you can read them — one-shot containers on a managed PaaS, job runners that stream logs to a UI with no export, batch jobs whose logs roll over, headless agent contexts without shell access to the host. The pattern: have the task itself write its captured output into a data store you CAN read (SQL row, Redis key, mounted file, public webhook).
 ---
 
 # Sidechannel Output Capture
 
 When the orchestrator's log retrieval is missing, broken, or asynchronous, don't fight it — make the task persist its own output to somewhere you can query.
 
-## When to use
-
-- Running a one-shot container in a system with no log-fetch API (managed PaaS, certain CI systems)
-- Job runner that streams logs to a UI but offers no programmatic export
-- Long-running batch job where logs roll over before you can grep them
-- Headless agent contexts where shell access to the runtime host is unavailable
-
-## When NOT to use
+## Not for
 
 - You can just run `docker logs <id>` or `kubectl logs <pod>` — do that
 - The runtime emits a structured exit signal you actually trust (HTTP webhook, exit code only)

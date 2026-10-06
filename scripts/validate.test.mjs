@@ -67,6 +67,13 @@ test('README rows must exist once, under the right domain, for real skills', () 
   assert.ok(out.includes('README.md: row for missing skill skills/design/gone'));
 });
 
+test('a body-level "When to use" section is reported, other headings and code blocks are not', () => {
+  skill('workflow', 'triggers', undefined, '\n# x\n\n## When to use\n\n- asked\n');
+  skill('workflow', 'fine', undefined, '\n# x\n\n## When NOT to use\n\n```md\n## When to use\n```\n');
+  readme({ Workflow: ['workflow/triggers', 'workflow/fine'] });
+  assert.deepEqual(messages(), ['skills/workflow/triggers/SKILL.md: body has a "When to use" section; move trigger conditions into the description']);
+});
+
 test('unknown domains, bad names, empty resource dirs and broken links are reported', () => {
   skill('misc', 'Bad_Name');
   mkdirSync(join(root, 'skills/misc/Bad_Name/scripts'));

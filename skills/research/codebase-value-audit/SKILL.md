@@ -4,7 +4,8 @@ description: >
   Use when asked whether a codebase's size is justified — "is 800k lines
   reasonable?", "audit our LOC", "are we bloated?", "值不值" — or when a
   LOC number is being used in an argument and nobody agrees what it
-  measures. Produces a defensible per-sub-product accounting: strict line
+  measures, or when deciding which subsystems dilute maintenance
+  attention and deserve a cut. Produces a defensible per-sub-product accounting: strict line
   counts, a product-surface inventory, every line attributed to exactly
   one sub-product, and a worth verdict per block.
 ---
@@ -19,12 +20,10 @@ judged against what a standalone alternative would cost. The output is a
 report where the verdict is per-block, not global — because the honest
 answer is always "these 4 blocks are gold, these 4 deserve a discount."
 
-## When to use
+## Scope
 
-- Someone quotes a repo-wide LOC figure and asks if it's reasonable.
-- Two people quote different LOC figures for the same repo and both are
-  "right" (different lenses) — reconcile before arguing.
-- Deciding where to cut: which subsystems dilute maintenance attention.
+When two people quote different LOC figures for the same repo, both can be
+"right" under different lenses; reconcile the lenses before arguing.
 
 Not for: per-PR review, performance work, or dead-code sweeps alone
 (knip/depcheck do that); this skill tells you *which blocks* deserve a

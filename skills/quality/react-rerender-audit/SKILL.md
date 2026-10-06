@@ -20,7 +20,7 @@ through unmemoized intermediates.
 
 This skill measures first, names the exact hook, then moves state down.
 
-## When to use
+## Scope
 
 - In scope: React 18/19 apps with a push stream (WebSocket, SSE, polling,
   `setInterval`), Vite dev server, Electron renderers, browser tabs.

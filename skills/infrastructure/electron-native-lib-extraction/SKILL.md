@@ -21,7 +21,7 @@ extraction order and the traps. The worked example throughout is a
 Sparkle.framework bridge with an appcast release toolchain, extracted from a
 desktop app into its own package.
 
-## When to use
+## Scope
 
 - In scope: source-distributed native npm packages for Electron (consumer
   compiles at build time), macOS framework linking, electron-builder
