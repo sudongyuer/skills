@@ -76,7 +76,9 @@ Done when someone else can install today's build.
 
 - [ ] Acceptance evidence for each user-visible change (see `acceptance`).
       Once per project: copy `acceptance/PROJECT.md` to
-      `.agents/acceptance/PROJECT.md` and fill in how to run the app.
+      `.agents/acceptance/PROJECT.md` and fill in how to run the app; copy
+      `acceptance/FEATURES.md` next to it, add a row per feature, and run the
+      acceptance skill's `check-feature-map.mjs check` in CI.
 - [ ] Implementation Record appended to the spec before the PR (see
       `spec-lifecycle`).
 

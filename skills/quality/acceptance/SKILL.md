@@ -33,6 +33,7 @@ Before touching an environment, check for `.agents/acceptance/`:
 | ------------------------ | ------------------------------------------------------------ |
 | `PROJECT.md`             | Start/stop commands, ports, services, auth, surfaces, probes |
 | `PROCESS.md`             | The run process: approval gate, execution rules, teardown    |
+| `FEATURES.md`            | Feature map: entry, owning files, how to verify each feature |
 | `common-mistakes.md`     | Project living log — what earlier rounds got wrong here      |
 | `probe-mock-patterns.md` | Project living log — how to force state on this product      |
 
@@ -156,6 +157,10 @@ excuse below was made in a real round.
 
 ## Pick the surface by what you changed
 
+With a feature map, start from `check-feature-map.mjs touched` (see
+[project-adapter.md](references/project-adapter.md#feature-map)): every touched
+feature needs a case, and its row names the entry and surface.
+
 Match the change to the cheapest surface that can prove it; escalate only if
 needed.
 
@@ -229,6 +234,7 @@ Steps and hosting options: [report.md](references/report.md#attaching-to-a-pull-
 | Need                                          | Reference                                                                                                                                                                               |
 | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | The project layer, bootstrapping an adapter   | [project-adapter.md](references/project-adapter.md), [templates/PROJECT.md](templates/PROJECT.md)                                                                                       |
+| Feature map and its checker                   | [templates/FEATURES.md](templates/FEATURES.md), [scripts/check-feature-map.mjs](scripts/check-feature-map.mjs)                                                                          |
 | Mistakes checklist (read every round)         | [common-mistakes.md](references/common-mistakes.md)                                                                                                                                     |
 | Forcing state, error injection, runtime probes | [probe-mock-patterns.md](references/probe-mock-patterns.md)                                                                                                                            |
 | `result.json`, reviews, rendering, PR handoff | [report.md](references/report.md)                                                                                                                                                       |

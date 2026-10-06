@@ -52,7 +52,7 @@ scripts/validate.mjs             仓库校验（CI 也跑这个）
 
 | Skill | 用途 |
 | ----- | ---- |
-| [`acceptance`](skills/quality/acceptance/SKILL.md) | 驱动真实产品取证（截图、录屏、输出），生成不可变的验收轮次并附到 PR |
+| [`acceptance`](skills/quality/acceptance/SKILL.md) | 驱动真实产品取证（截图、录屏、输出），生成不可变的验收轮次并附到 PR；功能地图 FEATURES.md 告诉 agent 改动涉及哪些功能、从哪进入、怎么验证 |
 | [`break-ui`](skills/quality/break-ui/SKILL.md) | 用最坏的真实数据冲击界面（长名字、空列表、计数为 1、超大字号），报告坏在哪、怎么修 |
 | [`catch-single-frame-flicker-on-iphone`](skills/quality/catch-single-frame-flicker-on-iphone/SKILL.md) | 有线 120fps 录 iPhone 真机屏幕，逐帧找出并证明只闪一帧的界面问题（遮罩闪回、残影），修复前后对比异常帧数 |
 | [`find-animation-opportunities`](skills/quality/find-animation-opportunities/SKILL.md) | 找出真正值得加动效的地方，同时列出被否决的候选和理由 |

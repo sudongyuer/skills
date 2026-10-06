@@ -83,6 +83,7 @@ name where they come from. -->
 - Quick navigation: `<command> goto <route>`
 - Capture helpers: `<e.g. raw-CDP screenshot script>`
 - Routes worth jumping to: <list>
+- Feature map: `.agents/acceptance/FEATURES.md` (which feature lives where and how to verify it)
 
 ## 6. Known constraints
 
