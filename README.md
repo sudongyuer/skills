@@ -86,6 +86,7 @@ scripts/validate.mjs             仓库校验（CI 也跑这个）
 | [`emil-design-eng`](skills/design/emil-design-eng/SKILL.md) | 界面打磨与动效的判断方法，持有唯一的动效标准（motion-standards） |
 | [`generate-design-md`](skills/design/generate-design-md/SKILL.md) | 分析一个品牌或网站的视觉体系，生成 DESIGN.md |
 | [`prototype`](skills/design/prototype/SKILL.md) | 同一界面做 3–5 个真正不同的方向，用切换器对比并标出推荐（只能手动调用） |
+| [`replicate-interaction-from-video`](skills/design/replicate-interaction-from-video/SKILL.md) | 照着录屏复刻交互动效：逐帧取样、状态表、假数据驱动、逐帧步进截图、几何与逐字曲线拟合、对比到误差达标 |
 
 ### Engineering
 
