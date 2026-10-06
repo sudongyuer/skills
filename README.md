@@ -39,6 +39,7 @@ scripts/validate.mjs             仓库校验（CI 也跑这个）
 
 | Skill | 用途 |
 | ----- | ---- |
+| [`escalate-correction`](skills/workflow/escalate-correction/SKILL.md) | 被纠正或修完 bug 后，按五层顺序（代码结构 > 静态检查/CI/hook > 规则 > skill > 人工 review）决定防再犯落在哪层，给出改动和证明它生效的检查 |
 | [`holding-analytical-judgment`](skills/workflow/holding-analytical-judgment/SKILL.md) | 对方情绪化反驳时不随意改口，只因新证据修正结论 |
 | [`prompting-playbook`](skills/workflow/prompting-playbook/SKILL.md) | 只写约束的启动指令、编号方案、先讨论后实现、审阅反馈与自检循环 |
 | [`session-handoff`](skills/workflow/session-handoff/SKILL.md) | 为另一个 agent 或新会话生成可直接接手的交接说明 |

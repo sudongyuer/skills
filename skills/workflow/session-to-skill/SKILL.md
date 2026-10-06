@@ -35,7 +35,7 @@ There is no default path; `resolve-skill-repo.sh` fails with instructions when
 neither is set. The repository is expected to have `skills/<domain>/<name>/`,
 an optional `templates/SKILL.template.md`, and a `README.md` with one table per
 `### <Domain>` heading. Domains: `workflow`, `quality`, `mobile`, `design`,
-`research`, `infrastructure`.
+`engineering`, `research`, `infrastructure`.
 
 ## Scripts
 
@@ -101,6 +101,7 @@ project-local facts. Classify each item by its future function:
 
 | Destination | Include | Exclude |
 | ----------- | ------- | ------- |
+| Code or check (type, module boundary, lint rule, CI step, hook) in the affected repository | A constraint a machine can enforce, so no rule has to carry it | Taste calls that vary case by case |
 | Skill | Repeatable action, decision boundary, non-obvious constraint, and observable proof | Session chronology and personal reflection |
 | Project documentation (project `AGENTS.md` rule, spec Implementation Record, or docs) | Repository-specific ownership, commands, architecture, invariants, and persistent local conventions | General reusable workflow |
 | Global rule (`~/.claude/CLAUDE.md`) | Short cross-project behavioral rule the agent must always follow, independent of any repository | Procedures, repository facts, anything needing more than a few lines |
@@ -139,17 +140,13 @@ Lowercase kebab-case.
 Keep one thesis per skill. Split when triggers, targets, or completion
 criteria can vary independently.
 
-**Rule escalation.** Place each rule at the narrowest level that covers every
-case where it must apply:
-
-| Level | Use when |
-| ----- | -------- |
-| Project `AGENTS.md` | The rule or fact is true only in one repository (its commands, boundaries, invariants). Default choice. |
-| Global `~/.claude/CLAUDE.md` | The same short behavioral correction applies in every project and must be active without a trigger. |
-| Skill | The knowledge is a multi-step, triggerable procedure useful across projects and passes all seven gates. |
-
-Escalate only with evidence that the narrower level is insufficient. Never
-duplicate one rule across levels.
+**Rule escalation.** Before writing any rule, ask whether code structure or a
+static check, CI step or hook could enforce it instead; prefer those. For what
+remains a rule or a skill, place it at the narrowest scope that covers every
+case. Both decisions follow
+[correction-layers.md](../escalate-correction/references/correction-layers.md);
+for a single correction use `escalate-correction`. Never duplicate one rule
+across layers or scopes.
 
 **Resources.** Plan bundled resources by function, not line count:
 
@@ -174,7 +171,7 @@ Every generated skill requires:
 
 | Required element | Standard |
 | ---------------- | -------- |
-| Frontmatter | Only `name` and `description`. Put the capability and all trigger conditions in `description`; no body-level "When to use" section. |
+| Frontmatter | `name` and `description`, plus `argument-hint` or `disable-model-invocation: true` where the repository allows them. Put the capability and all trigger conditions in `description`; no body-level "When to use" section. |
 | Capability boundary | Outcome, prerequisites, exclusions, and stopping conditions. |
 | Operational core | Shortest sufficient procedure or decision path in dependency order, as imperative instructions. |
 | Verification | Proof of the externally meaningful outcome, including safety checks where relevant. |
@@ -207,7 +204,7 @@ their owning files, following that repository's contribution rules.
 
 ### [4] Report
 
-Tell the user, per destination: accepted skills (path, commit), rejected
+Tell the user, per destination: code or checks proposed, accepted skills (path, commit), rejected
 candidates and the gate each failed, project documentation written (file and
 section), global rules added, and what was discarded. State that nothing was
 pushed unless they asked.
@@ -239,12 +236,12 @@ pushed unless they asked.
 - [ ] `$S` resolved via the search loop; `resolve-skill-repo.sh` printed a real directory before any write.
 - [ ] Intake answer recorded (or present in the trigger) before [1].
 - [ ] Skill work skipped when intake said `none`; gates applied when `required` or `defer`.
-- [ ] Every evidence item classified as skill, project documentation, global rule, or discard.
+- [ ] Every evidence item classified as code or check, skill, project documentation, global rule, or discard.
 - [ ] Every skill has a capability thesis and passes all seven gates.
 - [ ] Every skill has one trigger family, one operational target, and one primary observable outcome.
-- [ ] Frontmatter contains only `name` and `description`; the description carries all trigger conditions.
+- [ ] Frontmatter holds only the keys the repository allows; the description carries all trigger conditions.
 - [ ] The body has capability boundary, operational core, and verification, with no empty conditional sections, under 500 lines.
 - [ ] Scripts, references, and assets exist only when they improve deterministic reuse or progressive disclosure.
-- [ ] Each rule sits at the narrowest sufficient level (project `AGENTS.md` → global `CLAUDE.md` → skill), with no duplicates.
+- [ ] Each guarantee sits at the lowest enforcement layer that holds (structure → check → rule → skill → review), and each rule at the narrowest scope, with no duplicates.
 - [ ] Every accepted skill passed validation and repository hooks and is committed; nothing pushed unless requested.
 - [ ] The final report lists what went where, including rejected candidates and their failing gate.

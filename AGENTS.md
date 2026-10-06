@@ -73,18 +73,18 @@ filler.
 
 ## Where a lesson goes
 
-Rules move up only when they have proven general:
+First decide what enforces it, then, only for rules and skills, where the
+text lives. Both tables live once, in
+[correction-layers.md](skills/workflow/escalate-correction/references/correction-layers.md):
 
-1. **Project `AGENTS.md`** — a constraint or incident rule that holds for one
-   repository. Default destination.
-2. **Global `~/.claude/CLAUDE.md`** (the `claude` config repository) — a short
-   behavioral rule that has held in at least two projects, or is obviously
-   true for every project (e.g. "never disable code signing").
-3. **A skill here** — a repeatable procedure with a trigger, a non-obvious
-   method, and an observable outcome (the seven gates in `session-to-skill`).
+1. **Enforcement**: code structure > static check, CI or hook > rule > skill >
+   human review. Stop at the first layer that catches every future instance.
+2. **Scope**: project `AGENTS.md` by default; global `~/.claude/CLAUDE.md` (the
+   `claude` config repository) after it has held in two projects; a skill here
+   for a repeatable procedure that passes the seven gates in `session-to-skill`.
 
-When a rule moves up, remove or shorten the lower copy so it is not
-maintained twice.
+Keep one copy: when a guarantee moves to a lower layer or a wider scope, remove
+or shorten the old one.
 
 ## Checks
 
