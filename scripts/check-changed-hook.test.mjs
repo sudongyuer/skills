@@ -60,3 +60,9 @@ test('a re-entered stop does not block again', () => {
   const hook = install(['*.ts|false']);
   assert.equal(run(hook, '{"stop_hook_active": true}').status, 0);
 });
+
+test('an entry without a glob runs once without file arguments', () => {
+  writeFileSync(join(root, 'a.ts'), 'x');
+  const hook = install(['test $# -eq 0 && false']);
+  assert.equal(run(hook).status, 2);
+});

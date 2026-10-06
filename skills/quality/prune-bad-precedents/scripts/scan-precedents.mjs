@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process';
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, realpathSync, readdirSync, statSync } from 'node:fs';
 import { extname, join, relative, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 const SKIP_DIRS = new Set(['.git', 'node_modules', 'vendor', 'Pods', 'dist', 'build', 'out', '.next', 'coverage', 'DerivedData', '.acceptance']);
 const SKIP_FILE = /(?:\.min\.|\.lock$|-lock\.json$|\.snap$|\.map$)/;
@@ -106,4 +106,12 @@ function main(argv) {
   }
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href || fileURLToPath(import.meta.url) === resolve(process.argv[1] ?? '')) main(process.argv.slice(2));
+const isEntryPoint = () => {
+  try {
+    return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+};
+
+if (process.argv[1] && isEntryPoint()) main(process.argv.slice(2));

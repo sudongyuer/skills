@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, test } from 'node:test';
@@ -79,4 +79,22 @@ test('the CLI touched command reads the diff against a base ref', () => {
   assert.match(res.stdout, /src\/other\.ts/);
   const check = spawnSync('node', [SCRIPT, 'check', '--root', root], { encoding: 'utf8' });
   assert.equal(check.status, 0, check.stderr);
+});
+
+test('runs when invoked through a symlinked skill directory', () => {
+  write('src/a.ts');
+  write('.agents/acceptance/FEATURES.md', `${HEADER}| A | cli | run a | \`src/a.ts\` | run it |\n`);
+  const link = join(root, 'linked-scripts');
+  symlinkSync(dirname(SCRIPT), link);
+  const res = spawnSync('node', [join(link, 'check-feature-map.mjs'), 'check', '--root', root], { encoding: 'utf8' });
+  assert.equal(res.status, 0, res.stderr);
+  assert.match(res.stdout, /ok: 1 feature/);
+});
+
+test('touched reports a missing base ref instead of crashing', () => {
+  write('.agents/acceptance/FEATURES.md', `${HEADER}| A | cli | run a | \`.agents/\` | run it |\n`);
+  spawnSync('git', ['init', '-q'], { cwd: root });
+  const res = spawnSync('node', [SCRIPT, 'touched', '--root', root, '--base', 'no-such-ref'], { encoding: 'utf8' });
+  assert.equal(res.status, 1);
+  assert.match(res.stderr, /cannot diff against "no-such-ref"/);
 });

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, realpathSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 const COLUMNS = ['feature', 'surface', 'entry', 'files', 'verify'];
 
@@ -96,7 +96,7 @@ export function touchedFeatures(rows, changed) {
 }
 
 function changedFiles(root, base) {
-  const run = (args) => execFileSync('git', args, { cwd: root, encoding: 'utf8' }).split('\n').filter(Boolean);
+  const run = (args) => execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).split('\n').filter(Boolean);
   const mergeBase = run(['merge-base', base, 'HEAD'])[0];
   return [...new Set([...run(['diff', '--name-only', mergeBase]), ...run(['ls-files', '--others', '--exclude-standard'])])];
 }
@@ -124,7 +124,15 @@ function main(argv) {
     console.log(`ok: ${rows.length} feature(s), every path exists`);
     return;
   }
-  const { touched, unmapped } = touchedFeatures(rows, changedFiles(root, flag('--base') ?? 'origin/HEAD'));
+  const base = flag('--base') ?? 'origin/HEAD';
+  let changed;
+  try {
+    changed = changedFiles(root, base);
+  } catch {
+    console.error(`cannot diff against "${base}"; pass --base <ref> with a branch that exists, e.g. origin/main`);
+    process.exit(1);
+  }
+  const { touched, unmapped } = touchedFeatures(rows, changed);
   for (const row of touched) console.log(`${row.feature} [${row.surface}] entry: ${row.entry} | verify: ${row.verify}`);
   if (!touched.length) console.log('no mapped feature touched');
   if (unmapped.length) console.log(`\nchanged files no feature lists (add a row or extend one if user-visible):\n${unmapped.map((f) => `  ${f}`).join('\n')}`);
@@ -134,4 +142,12 @@ function main(argv) {
   }
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href || fileURLToPath(import.meta.url) === resolve(process.argv[1] ?? '')) main(process.argv.slice(2));
+const isEntryPoint = () => {
+  try {
+    return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+};
+
+if (process.argv[1] && isEntryPoint()) main(process.argv.slice(2));

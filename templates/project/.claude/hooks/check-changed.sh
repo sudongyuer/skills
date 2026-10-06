@@ -31,8 +31,13 @@ matching() {
 
 failed=0
 for entry in "${CHECKS[@]}"; do
-  globs="${entry%%|*}"
-  check="${entry#*|}"
+  if [[ "$entry" == *"|"* ]]; then
+    globs="${entry%%|*}"
+    check="${entry#*|}"
+  else
+    globs="-"
+    check="$entry"
+  fi
   targets=()
   if [ "$globs" != "-" ]; then
     while IFS= read -r f; do targets+=("$f"); done < <(matching "$globs")

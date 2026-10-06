@@ -37,7 +37,7 @@ Done when every risk has a verified answer or an accepted fallback.
       `.claude/settings.json` plus `.claude/hooks/check-changed.sh`.
 - [ ] Fill `CHECKS` in `.claude/hooks/check-changed.sh`, one entry per check,
       as `'<globs>|<command>'`: the changed files matching the comma-separated
-      globs are appended to the command, and `-` runs it once with no files.
+      globs are appended to the command; `-` or no `|` runs it once with no files.
       Example: `'*.ts,*.tsx|pnpm exec eslint --max-warnings=0'`,
       `'-|pnpm exec tsc --noEmit'`. The Stop hook then refuses to let the agent
       finish while a check fails on files it changed, so "run lint before you

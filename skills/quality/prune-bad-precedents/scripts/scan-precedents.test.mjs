@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import { scan } from './scan-precedents.mjs';
 
@@ -16,6 +18,8 @@ function write(path, lines) {
   mkdirSync(dirname(join(root, path)), { recursive: true });
   writeFileSync(join(root, path), lines.join('\n'));
 }
+
+const SCRIPT = fileURLToPath(new URL('./scan-precedents.mjs', import.meta.url));
 
 const found = (category) => scan(root).hits.filter((h) => h.category === category).map((h) => `${h.file}:${h.line}`);
 
@@ -69,4 +73,13 @@ test('identical hits are counted as copies and vendored directories are skipped'
 test('categories can be narrowed', () => {
   write('a.ts', ['// @ts-ignore', '// TODO later']);
   assert.deepEqual(scan(root, { categories: ['untracked-todo'] }).hits.map((h) => h.category), ['untracked-todo']);
+});
+
+test('runs when invoked through a symlinked skill directory', () => {
+  write('src/a.ts', ['// @ts-ignore']);
+  const link = join(root, 'linked-scripts');
+  symlinkSync(dirname(SCRIPT), link);
+  const res = spawnSync(process.execPath, [join(link, 'scan-precedents.mjs'), join(root, 'src'), '--json'], { encoding: 'utf8' });
+  assert.equal(res.status, 0, res.stderr);
+  assert.deepEqual(JSON.parse(res.stdout).hits.map((h) => h.file), ['a.ts']);
 });
