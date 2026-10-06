@@ -11,7 +11,12 @@ description: >
   interaction and wants it rebuilt, asks how an animation was made, or says a
   replica "looks close but the details are off"; also for "这个动画是怎么做的",
   "照着这个视频做", "复刻这个动效", "参考这个交互做出来", "逐帧分析",
-  "动画没对齐", "细节还是不一致", "文字动画对不上".
+  "动画没对齐", "细节还是不一致", "文字动画对不上". To build new web motion
+  without a reference use `animate`; for motion judgment and default values use
+  `emil-design-eng`; to review a motion change use `review-animations`; to name
+  an effect use `animation-vocabulary`; for a single-frame flash on a physical
+  iPhone use `catch-single-frame-flicker-on-iphone`; for main-thread stalls use
+  `measure-iphone-interaction-hangs`.
 ---
 
 # Replicate an interaction from a video
@@ -40,6 +45,16 @@ invisible at 4 fps and only found by dense frames or by numbers.
   gaps are attributable to something you cannot change (font, map tiles,
   platform rendering) and are reported as such. Ask before spending more
   rounds on single-glyph or single-frame differences.
+
+## Gate
+
+Stop and say why, with no replica, when:
+
+- there is no recording, only a description (use `animate` or `emil-design-eng`);
+- the recording is under ~30 fps or heavily compressed, so per-frame
+  measurement cannot resolve the motion (ask for a screen recording at 60 fps);
+- the motion depends on input you cannot see (a finger's velocity, a scroll
+  position) and the user cannot describe it.
 
 ## Workflow
 
@@ -74,6 +89,9 @@ Follow [references/capture.md](references/capture.md): frames at the point grid
 see the phases, and a duplicate-frame count to learn the app's real render
 rate.
 
+Done when: every frame is decoded at the point grid, text regions at 3x, and
+the duplicate-frame count is known.
+
 ### 2. Look densely and write the state table
 
 For each phase seen on the overview, extract 10–20 fps crops of just that
@@ -89,6 +107,8 @@ neighbours that slide when text grows; wipes vs scales; fades vs pops; things
 that appear only near the end. Use `frame_strip.py` whenever you are unsure
 what you are looking at.
 
+Done when: every visible change in the recording maps to a row with a trigger.
+
 ### 3. Measure the reference
 
 Pick a metric per row of the state table and run it over every frame —
@@ -96,6 +116,9 @@ Pick a metric per row of the state table and run it over every frame —
 and shows the commands. **Validate each instrument on a frame where you know
 the answer before trusting it**; the failure table in that file lists the
 ways measurement lied in practice.
+
+Done when: each state-table row has a measured curve, and each instrument has
+been checked on a frame with a known answer.
 
 ### 4. Fit parameters
 
@@ -110,6 +133,9 @@ Translate them with [references/motion-recipes.md](references/motion-recipes.md)
 (spring math, initial velocity, chained springs, per-glyph entry, FLIP,
 raw→formatted swap, wipes).
 
+Done when: every row has numbers (start time, duration or spring, entry and
+exit states), none of them guessed.
+
 ### 5. Build the replica on a deterministic fake stream
 
 - Drive everything from a script of `[timeMs, action]` events with **absolute
@@ -121,11 +147,17 @@ raw→formatted swap, wipes).
 - Match the reference's point grid: derive CSS sizes as pt × (replica content
   width ÷ reference point width).
 
+Done when: the replica plays the whole state table from the fake stream and
+exposes the capture hooks.
+
 ### 6. Capture the replica frame-stepped
 
 `step_capture.mjs` with `--ref-width` equal to the reference's point width,
 `--scale 3` for text regions. Never compare against a real-time recording of
 the replica.
+
+Done when: the replica's frame count, frame rate and pixel scale equal the
+reference's.
 
 ### 7. Compare and iterate
 
@@ -140,6 +172,9 @@ the replica.
 4. When the replica changes, re-run every earlier comparison; text changes
    can move card heights.
 
+Done when: every Verification threshold passes, or the remaining gaps have a
+cause you cannot change (font, map tiles, platform rendering).
+
 ### 8. Report
 
 Give the user: the state table, the fitted parameters, each metric's error
@@ -148,6 +183,17 @@ and a side-by-side video built as in
 [references/capture.md](references/capture.md)), and every
 remaining gap with its cause. Name residuals honestly ("font not installed",
 "single-glyph overshoot not modelled", "only row 1 measured").
+
+## Never ship
+
+| Never | Instead |
+| ----- | ------- |
+| A replica tuned by eye against sampled frames | Measure every frame and fit the parameters |
+| A comparison against a real-time recording of the replica | Frame-stepped capture at the reference's fps and scale |
+| A diff from an instrument you have not checked | Run it on a frame with a known answer first |
+| Character timing from a fixed per-character rate | Chunk times from `glyph_fit.py` onsets and `track_template.py` slot times |
+| One spring chasing another | Targets from the child's final value, one spring family |
+| "Matches" for something that was not measured | Name it as a residual with its cause |
 
 ## Verification
 

@@ -6,11 +6,16 @@ defaults; always use your own fits.
 
 ## Springs
 
-SwiftUI-style `spring(response: R, dampingFraction: ζ)` for unit mass:
+What response and damping ratio mean, and the defaults for new motion, live in
+[`emil-design-eng`'s motion standards](../../emil-design-eng/references/motion-standards.md#springs).
+When replicating, the reference's **measured** values win over those defaults.
+
+To drive a fitted `spring(response: R, dampingFraction: ζ)` from the page's
+virtual clock, convert it to stiffness and damping for unit mass and integrate
+with semi-implicit Euler in substeps of at most 1/240 s:
 
 ```js
 function springK(response, damping) { const w = 2 * Math.PI / response; return [w * w, 2 * damping * w]; }
-// semi-implicit Euler at <= 1/240 s substeps, driven by the page's virtual clock
 s.v += (k * (s.target - s.x) - c * s.v) * h; s.x += s.v * h;
 ```
 

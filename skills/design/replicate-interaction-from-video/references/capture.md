@@ -9,14 +9,17 @@ Decode every frame at the **point grid** (1 px = 1 pt) for geometry, and at
 **3x** for text. Find the point width from the device (402 pt for an iPhone 17
 Pro, 393 for an iPhone 16; check the recording's pixel width ÷ scale factor).
 
+The commands below print the stream's size and rate, decode every frame at the
+point grid (geometry), decode one text region at native 3x for frames 50–200,
+and build a 4 fps contact sheet of the whole recording:
+
 ```bash
 REF=reference.mp4
 ffprobe -v error -show_entries stream=width,height,r_frame_rate -of compact "$REF"
 mkdir -p ref/pt ref/x3
-ffmpeg -v error -i "$REF" -vf "scale=402:-1" ref/pt/%04d.png          # geometry
+ffmpeg -v error -i "$REF" -vf "scale=402:-1" ref/pt/%04d.png
 ffmpeg -v error -i "$REF" -vf "select='between(n\,50\,200)',crop=1206:500:0:600" \
-  -vsync 0 -start_number 50 ref/x3/%04d.png                             # one text region, native 3x
-# overview: 4 fps contact sheet
+  -vsync 0 -start_number 50 ref/x3/%04d.png
 ffmpeg -v error -i "$REF" -vf "fps=4,scale=300:-1,tile=6x5" -frames:v 1 ref/overview.png
 ```
 
@@ -36,21 +39,24 @@ clock. Step the page clock instead, so frame *i* is exactly *i/60* s.
 
 Expose two hooks in the page. All motion must be driven by one virtual clock
 (`vt`) or by CSS animations/transitions; never by `setTimeout`/`setInterval`.
+`advance` fires due fake-stream events, steps the JS springs, then moves every
+CSS animation and transition (`document.getAnimations()`) forward by the same
+`ms`. The page's `requestAnimationFrame` loop returns early while `capture` is
+true.
 
 ```js
 let capture = false;
 function advance(ms) {
   vt += ms;
-  while (idx < events.length && events[idx][0] <= vt) events[idx++][1](); // fake stream
-  stepSprings(ms / 1000);                                                 // JS springs
-  for (const an of document.getAnimations()) {                            // CSS animations + transitions
+  while (idx < events.length && events[idx][0] <= vt) events[idx++][1]();
+  stepSprings(ms / 1000);
+  for (const an of document.getAnimations()) {
     if (!an.__cap) { an.__cap = true; an.pause(); an.currentTime = 0; }
     else an.currentTime = (an.currentTime || 0) + ms;
   }
 }
 window.__capture = () => { capture = true; reset(); advance(0); };
 window.__step = (ms) => advance(ms);
-// in the requestAnimationFrame loop: if (capture) return;
 ```
 
 An animation created during a step starts at `currentTime = 0` on the next
