@@ -52,8 +52,14 @@ scripts/validate.mjs             仓库校验（CI 也跑这个）
 | Skill | 用途 |
 | ----- | ---- |
 | [`acceptance`](skills/quality/acceptance/SKILL.md) | 驱动真实产品取证（截图、录屏、输出），生成不可变的验收轮次并附到 PR |
+| [`break-ui`](skills/quality/break-ui/SKILL.md) | 用最坏的真实数据冲击界面（长名字、空列表、计数为 1、超大字号），报告坏在哪、怎么修 |
+| [`catch-single-frame-flicker-on-iphone`](skills/quality/catch-single-frame-flicker-on-iphone/SKILL.md) | 有线 120fps 录 iPhone 真机屏幕，逐帧找出并证明只闪一帧的界面问题（遮罩闪回、残影），修复前后对比异常帧数 |
+| [`find-animation-opportunities`](skills/quality/find-animation-opportunities/SKILL.md) | 找出真正值得加动效的地方，同时列出被否决的候选和理由 |
+| [`improve-animations`](skills/quality/improve-animations/SKILL.md) | 全库动效体检：问题清单，选中后写成可交给其他 agent 执行的计划 |
 | [`ios-ui-verify`](skills/quality/ios-ui-verify/SKILL.md) | iOS 模拟器离线界面验证：验证模式、Debug 场景、AXe 脚本、浅色深色截图录屏 |
+| [`measure-iphone-interaction-hangs`](skills/quality/measure-iphone-interaction-hangs/SKILL.md) | 在 iPhone 真机 Release 包上用 xctrace 挂载进程，测一个交互的主线程卡顿时长，修复前后同脚本对比 |
 | [`react-rerender-audit`](skills/quality/react-rerender-audit/SKILL.md) | 从外部测量 React 重渲染，定位具体 hook，下放状态修复并用 Profiler 测试锁定 |
+| [`review-animations`](skills/quality/review-animations/SKILL.md) | 严格审查一处动效改动：缺陷直接标出，品味选择给编号方案（只能手动调用） |
 | [`spec-lifecycle`](skills/quality/spec-lifecycle/SKILL.md) | 设计文档状态管理、实现后回填实施记录、推翻时写取代文档、索引与校验脚本 |
 
 ### Mobile
@@ -63,17 +69,32 @@ scripts/validate.mjs             仓库校验（CI 也跑这个）
 | Skill | 用途 |
 | ----- | ---- |
 | [`app-store-listing`](skills/mobile/app-store-listing/SKILL.md) | App Store 上架材料：多语言文案、官方机框截图、Connect 问卷 |
+| [`mobile-native`](skills/mobile/mobile-native/SKILL.md) | 让网页在手机上像 App：hover、点击高亮、100vh、输入缩放、安全区等 |
 | [`product-visuals`](skills/mobile/product-visuals/SKILL.md) | 用真实截图和官方机框合成产品宣传图 |
 
 ### Design
 
-> 设计系统与设计文档。
+> 设计系统、设计文档与动效。
 
 | Skill | 用途 |
 | ----- | ---- |
+| [`animate`](skills/design/animate/SKILL.md) | 网页动效：先判断该不该动，再选工具、属性、曲线、时长，给编号方案后实现 |
+| [`animate-expo`](skills/design/animate-expo/SKILL.md) | RN / Expo 动效：Reanimated、手势、原生 sheet、触感反馈、减弱动态效果 |
+| [`animation-vocabulary`](skills/design/animation-vocabulary/SKILL.md) | 动效术语反查：把模糊描述变成准确的词，方便给 AI 或设计师下指令 |
+| [`apple-design`](skills/design/apple-design/SKILL.md) | Apple 交互与动效原则：响应、可打断、速度衔接、材质、字体；原生项目只作判断标准 |
 | [`design-system`](skills/design/design-system/SKILL.md) | 设计系统骨架：任务分流、速查表、禁用写法、token 检查脚本、mockup 模板 |
+| [`emil-design-eng`](skills/design/emil-design-eng/SKILL.md) | 界面打磨与动效的判断方法，持有唯一的动效标准（motion-standards） |
 | [`generate-design-md`](skills/design/generate-design-md/SKILL.md) | 分析一个品牌或网站的视觉体系，生成 DESIGN.md |
+| [`prototype`](skills/design/prototype/SKILL.md) | 同一界面做 3–5 个真正不同的方向，用切换器对比并标出推荐（只能手动调用） |
 | [`replicate-interaction-from-video`](skills/design/replicate-interaction-from-video/SKILL.md) | 照着录屏复刻交互动效：逐帧取样、状态表、假数据驱动、逐帧步进截图、几何与逐字曲线拟合、对比到误差达标 |
+
+### Engineering
+
+> 语言与工程实践。
+
+| Skill | 用途 |
+| ----- | ---- |
+| [`write-swift`](skills/engineering/write-swift/SKILL.md) | 现代 Swift：值类型、Swift 6 并发、泛型、性能、Swift Testing；含 Expo 模块的例外 |
 
 ### Research
 

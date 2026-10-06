@@ -43,11 +43,15 @@
       font: inherit;
       font-weight: var(--font-weight-medium);
       cursor: pointer;
-      transition: transform var(--duration-press) var(--ease-standard),
-                  background var(--duration-settle) var(--ease-standard);
+      transition: transform var(--duration-press) var(--ease-enter),
+                  background var(--duration-fade) var(--ease-enter);
     }
     .btn:hover { background: var(--color-neutral-3); }
     .btn:active { transform: scale(0.98); }
+    @media (prefers-reduced-motion: reduce) {
+      .btn { transition: filter var(--duration-fade) var(--ease-enter), background var(--duration-fade) var(--ease-enter); }
+      .btn:active { transform: none; filter: brightness(0.92); }
+    }
     .btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
     .btn-primary { background: var(--color-accent); color: var(--color-on-accent); border-color: transparent; }
     .btn-primary:hover { background: var(--color-accent); filter: brightness(1.05); }

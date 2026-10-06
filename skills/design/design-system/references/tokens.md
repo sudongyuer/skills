@@ -96,19 +96,29 @@ Summary; full rules in `typography.md`.
 
 ## Motion
 
-Durations are named by **intent**, never by number:
+Durations and easings are named by **intent**, never by number. The reasoning
+and the full value tables (frequency gate, budgets, springs) are in
+[motion-standards](../../emil-design-eng/references/motion-standards.md); these
+tokens are its web defaults.
 
-| Token               | Intent                                                   |
-| ------------------- | -------------------------------------------------------- |
-| `--duration-press`  | Press feedback: a physical sink or scale, not an opacity flicker |
-| `--duration-fade`   | Content appearing after load; fades are for loading only |
-| `--duration-settle` | Small state change settling in place                     |
-| `--duration-glide`  | Sheets, drawers, page transitions; at most one gentle overshoot |
+| Token               | Intent                                                                 |
+| ------------------- | ---------------------------------------------------------------------- |
+| `--duration-press`  | Press feedback: a physical sink or scale, not an opacity flicker       |
+| `--duration-fade`   | Opacity and color cross-fades: appearing content, hover and selection color, and the reduced-motion substitute for movement |
+| `--duration-settle` | Small movement settling in place (a toggle thumb, a reordered row)     |
+| `--duration-glide`  | Sheets, drawers, page transitions; at most 300ms                       |
+| `--ease-enter`      | Entering, exiting and any response to input (strong ease-out)          |
+| `--ease-move`       | Something already on screen moving from A to B (strong ease-in-out)    |
+| `--ease-linear`     | Constant motion and progress: spinners, progress bars, hold-to-confirm fills |
 
-- One default easing (`--ease-standard`). Springs belong to the component
-  layer (React / React Native animation libraries), configured to settle
-  within `--duration-glide`.
-- Reduced motion collapses durations to 0.
+- Never `ease-in` on UI.
+- Springs belong to the component layer (React / React Native animation
+  libraries), with bounce 0 by default and a perceptual duration within
+  `--duration-glide`; see the springs section of motion-standards.
+- Reduced motion: movement durations (`--duration-press`, `--duration-settle`,
+  `--duration-glide`) go to 0 and components replace the movement with a fade;
+  `--duration-fade` keeps its value so state changes stay legible. Native
+  consumers apply the same rule from the platform's reduce-motion setting.
 
 ## Layers
 

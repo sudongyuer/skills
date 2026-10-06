@@ -4,8 +4,8 @@ import { homedir } from 'node:os';
 import { dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-export const DOMAINS = ['workflow', 'quality', 'mobile', 'design', 'research', 'infrastructure'];
-const ALLOWED_KEYS = ['name', 'description', 'argument-hint'];
+export const DOMAINS = ['workflow', 'quality', 'mobile', 'design', 'engineering', 'research', 'infrastructure'];
+const ALLOWED_KEYS = ['name', 'description', 'argument-hint', 'disable-model-invocation'];
 const KEBAB = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const TEXT_EXT = new Set(['.md', '.mjs', '.js', '.ts', '.json', '.sh', '.py', '.html', '.css', '.yml', '.yaml', '.txt', '']);
 const SKIP_DIRS = new Set(['.git', 'node_modules', '.acceptance', 'out', 'dist']);
@@ -106,6 +106,9 @@ export function validateRepo(root, { privacy = false, denylist = [] } = {}) {
       if (!keys.description) report(`${rel}/SKILL.md`, 'frontmatter description is empty');
       const extra = Object.keys(keys).filter((key) => !ALLOWED_KEYS.includes(key));
       if (extra.length) report(`${rel}/SKILL.md`, `frontmatter may only contain ${ALLOWED_KEYS.join(', ')} (found ${extra.join(', ')})`);
+      if ('disable-model-invocation' in keys && keys['disable-model-invocation'] !== 'true') {
+        report(`${rel}/SKILL.md`, 'frontmatter disable-model-invocation must be true when present');
+      }
       const lines = text.split(/\r?\n/).length;
       if (lines > 500) report(`${rel}/SKILL.md`, `${lines} lines; keep SKILL.md under 500 and move detail to references/`);
       for (const sub of readdirSync(dir)) {
