@@ -109,6 +109,8 @@ export function validateRepo(root, { privacy = false, denylist = [] } = {}) {
       if ('disable-model-invocation' in keys && keys['disable-model-invocation'] !== 'true') {
         report(`${rel}/SKILL.md`, 'frontmatter disable-model-invocation must be true when present');
       }
+      const body = text.replace(/^---\r?\n[\s\S]*?\r?\n---/, '').replace(/```[\s\S]*?```/g, '');
+      if (/^#{1,6}\s+when to use\b/im.test(body)) report(`${rel}/SKILL.md`, 'body has a "When to use" section; move trigger conditions into the description');
       const lines = text.split(/\r?\n/).length;
       if (lines > 500) report(`${rel}/SKILL.md`, `${lines} lines; keep SKILL.md under 500 and move detail to references/`);
       for (const sub of readdirSync(dir)) {

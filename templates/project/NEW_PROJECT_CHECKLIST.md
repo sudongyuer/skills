@@ -33,7 +33,15 @@ Done when every risk has a verified answer or an accepted fallback.
       `CLAUDE.md` (`@AGENTS.md`), `docs/specs/README.md`,
       `docs/specs/_template.md` (from `spec.template.md`),
       `docs/plans/_template.md` (from `plan.template.md`), and
-      `scripts/check-specs.mjs` (copied from the `spec-lifecycle` skill).
+      `scripts/check-specs.mjs` (copied from the `spec-lifecycle` skill), and
+      `.claude/settings.json` plus `.claude/hooks/check-changed.sh`.
+- [ ] Fill `CHECKS` in `.claude/hooks/check-changed.sh`, one entry per check,
+      as `'<globs>|<command>'`: the changed files matching the comma-separated
+      globs are appended to the command; `-` or no `|` runs it once with no files.
+      Example: `'*.ts,*.tsx|pnpm exec eslint --max-warnings=0'`,
+      `'-|pnpm exec tsc --noEmit'`. The Stop hook then refuses to let the agent
+      finish while a check fails on files it changed, so "run lint before you
+      finish" needs no rule.
 
 Done when the agent can explain every boundary from `AGENTS.md` alone.
 
@@ -68,13 +76,17 @@ Done when someone else can install today's build.
 
 - [ ] Acceptance evidence for each user-visible change (see `acceptance`).
       Once per project: copy `acceptance/PROJECT.md` to
-      `.agents/acceptance/PROJECT.md` and fill in how to run the app.
+      `.agents/acceptance/PROJECT.md` and fill in how to run the app; copy
+      `acceptance/FEATURES.md` next to it, add a row per feature, and run the
+      acceptance skill's `check-feature-map.mjs check` in CI.
 - [ ] Implementation Record appended to the spec before the PR (see
       `spec-lifecycle`).
 
 ## 6. Every incident
 
-- [ ] Fix the bug, then add the rule in the same commit: project-specific →
-      `AGENTS.md` "Rules from incidents"; true for every project → global
-      `~/.claude/CLAUDE.md`; a repeatable procedure → a skill
-      (`session-to-skill`).
+- [ ] Fix the bug, search for the same pattern elsewhere, and in the same
+      commit add the lowest guarantee that holds (`escalate-correction`):
+      code structure, then a lint rule, CI step or hook, and only then a rule.
+      A rule goes to `AGENTS.md` "Rules from incidents" when project-specific,
+      to the global `~/.claude/CLAUDE.md` when it has held in two projects; a
+      repeatable procedure becomes a skill (`session-to-skill`).

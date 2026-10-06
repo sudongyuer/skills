@@ -21,6 +21,7 @@ is_, this skill wins.
 <repo>/.agents/acceptance/        # committed — the adapter and project logs are team assets
 ├── PROJECT.md                    # the adapter: commands, ports, services, auth, surfaces
 ├── PROCESS.md                    # optional: the project's run process (gate, teardown, evidence host)
+├── FEATURES.md                   # feature map: feature → surface → entry → files → how to verify
 ├── common-mistakes.md            # PROJECT-layer living log (writable)
 ├── probe-mock-patterns.md        # PROJECT-layer living log (writable)
 ├── references/                   # optional: project-owned how-tos
@@ -65,6 +66,28 @@ copy-pasteable skeleton is [../templates/PROJECT.md](../templates/PROJECT.md).
 
 `PROJECT.md` may reference project scripts under `.agents/acceptance/scripts/` or
 anywhere in the repo.
+
+## Feature map
+
+`FEATURES.md` answers "where is this feature, how do I reach it, and which files
+own it", so a run knows what to verify for a diff without rediscovering the
+product. One row per user-visible feature, five fixed columns; the skeleton is
+[../templates/FEATURES.md](../templates/FEATURES.md).
+
+```bash
+node <skill-dir>/scripts/check-feature-map.mjs touched --base origin/main
+node <skill-dir>/scripts/check-feature-map.mjs check
+```
+
+- `touched` lists the features whose files the current branch changed, with their
+  entry and verification path, plus changed files no row lists. Author cases for
+  every touched feature; for an unlisted user-visible file, add or extend a row in
+  the same change.
+- `check` fails when a listed path no longer exists. Run it in the project's CI so
+  the map cannot drift silently.
+
+Bootstrap it with `PROJECT.md`: draft rows from routes, screens, CLI commands and
+their owning directories, mark guesses, and confirm with the user.
 
 ## First-run bootstrap
 

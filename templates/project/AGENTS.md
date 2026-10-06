@@ -43,6 +43,8 @@ Delete these comments when the file is filled in.
 ## Checks
 
 - Before commit: `<lint/typecheck command>` and `<format command>` on changed files.
+  The Stop hook in `.claude/hooks/check-changed.sh` runs the same checks before the
+  agent may finish; keep its `CHECKS` in sync with this list.
 - `<test command>` when behavior changes. `<bundle/build command>` when the build can change.
 - UI changes add or update a check under `<verification/ui>` and run it in light and
   dark; screenshots for state, video for motion. Missing scenes and timeouts fail.
@@ -56,7 +58,8 @@ Delete these comments when the file is filled in.
 ## Rules from incidents
 
 <!-- Append one bullet per incident-driven rule: the rule, then a short reason.
-Project-specific rules stay here; rules that apply to every project move to the
-global ~/.claude/CLAUDE.md. -->
+Only what a type, module boundary, lint rule, CI step or hook cannot enforce
+belongs here (see the escalate-correction skill). Project-specific rules stay
+here; rules that apply to every project move to the global ~/.claude/CLAUDE.md. -->
 
 - <Rule.> Reason: <what broke>.

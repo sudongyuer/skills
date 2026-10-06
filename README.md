@@ -39,6 +39,7 @@ scripts/validate.mjs             仓库校验（CI 也跑这个）
 
 | Skill | 用途 |
 | ----- | ---- |
+| [`escalate-correction`](skills/workflow/escalate-correction/SKILL.md) | 被纠正或修完 bug 后，按五层顺序（代码结构 > 静态检查/CI/hook > 规则 > skill > 人工 review）决定防再犯落在哪层，给出改动和证明它生效的检查 |
 | [`holding-analytical-judgment`](skills/workflow/holding-analytical-judgment/SKILL.md) | 对方情绪化反驳时不随意改口，只因新证据修正结论 |
 | [`prompting-playbook`](skills/workflow/prompting-playbook/SKILL.md) | 只写约束的启动指令、编号方案、先讨论后实现、审阅反馈与自检循环 |
 | [`session-handoff`](skills/workflow/session-handoff/SKILL.md) | 为另一个 agent 或新会话生成可直接接手的交接说明 |
@@ -51,13 +52,14 @@ scripts/validate.mjs             仓库校验（CI 也跑这个）
 
 | Skill | 用途 |
 | ----- | ---- |
-| [`acceptance`](skills/quality/acceptance/SKILL.md) | 驱动真实产品取证（截图、录屏、输出），生成不可变的验收轮次并附到 PR |
+| [`acceptance`](skills/quality/acceptance/SKILL.md) | 驱动真实产品取证（截图、录屏、输出），生成不可变的验收轮次并附到 PR；功能地图 FEATURES.md 告诉 agent 改动涉及哪些功能、从哪进入、怎么验证 |
 | [`break-ui`](skills/quality/break-ui/SKILL.md) | 用最坏的真实数据冲击界面（长名字、空列表、计数为 1、超大字号），报告坏在哪、怎么修 |
 | [`catch-single-frame-flicker-on-iphone`](skills/quality/catch-single-frame-flicker-on-iphone/SKILL.md) | 有线 120fps 录 iPhone 真机屏幕，逐帧找出并证明只闪一帧的界面问题（遮罩闪回、残影），修复前后对比异常帧数 |
 | [`find-animation-opportunities`](skills/quality/find-animation-opportunities/SKILL.md) | 找出真正值得加动效的地方，同时列出被否决的候选和理由 |
 | [`improve-animations`](skills/quality/improve-animations/SKILL.md) | 全库动效体检：问题清单，选中后写成可交给其他 agent 执行的计划 |
 | [`ios-ui-verify`](skills/quality/ios-ui-verify/SKILL.md) | iOS 模拟器离线界面验证：验证模式、Debug 场景、AXe 脚本、浅色深色截图录屏 |
 | [`measure-iphone-interaction-hangs`](skills/quality/measure-iphone-interaction-hangs/SKILL.md) | 在 iPhone 真机 Release 包上用 xctrace 挂载进程，测一个交互的主线程卡顿时长，修复前后同脚本对比 |
+| [`prune-bad-precedents`](skills/quality/prune-bad-precedents/SKILL.md) | 扫描不希望被 agent 模仿的写法（无理由的 lint 屏蔽、无工单 TODO、为 workaround 辩解的注释、跳过的测试、固定 sleep、和规则矛盾的 agent 配置），出清单并指出哪些该变成 lint（只能手动调用） |
 | [`react-rerender-audit`](skills/quality/react-rerender-audit/SKILL.md) | 从外部测量 React 重渲染，定位具体 hook，下放状态修复并用 Profiler 测试锁定 |
 | [`review-animations`](skills/quality/review-animations/SKILL.md) | 严格审查一处动效改动：缺陷直接标出，品味选择给编号方案（只能手动调用） |
 | [`spec-lifecycle`](skills/quality/spec-lifecycle/SKILL.md) | 设计文档状态管理、实现后回填实施记录、推翻时写取代文档、索引与校验脚本 |

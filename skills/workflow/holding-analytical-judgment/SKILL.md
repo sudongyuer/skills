@@ -21,7 +21,7 @@ When the reader is the subject of the analysis (their code is being reviewed, th
 
 Treating (2) as (1) is appeasement, not analysis.
 
-## When to Use
+## Scope
 
 **Triggering situations** (reader = subject of analysis):
 
