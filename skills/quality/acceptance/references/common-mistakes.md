@@ -39,6 +39,7 @@ Apply the same shape to the project layer's file. Never narrate the reading.
 - **M22** An error-state case needs the failed status AND the user-facing message in the same screenshot.
 - **M28** Non-visual behavioral claims carry two text artifacts in the same round: reasoning, then execution record.
 - **M30** Electron evidence is the visible viewport, never `screenshot --full`.
+- **M31** A timing or ordering claim cites a frame strip labeled with each frame's recorded time (`scripts/timestamped-strip.sh`) that spans the whole interval; captions and paired shots describe exactly what they show.
 
 ## Entries
 
@@ -173,3 +174,16 @@ the UI is a tiny corner.
 **Rule:** capture the visible viewport without `--full` (or the project's CDP
 window-capture helper). Open the image; reject it if the app occupies a small
 fraction or black margins dominate. Never crop evidence in post-processing.
+
+### M31 — Timing claims backed by unlabeled frames
+
+**Symptom.** The observation says "the table shows at 26.0s, 0.5s before the action
+bar", but the strip has no times on it, starts after the change, or was sampled at
+a nominal rate from a variable-frame-rate recording. A reviewer cannot check the
+claim and marks it unsupported; a "same turn" pair turns out to be two turns.
+
+**Fix.** Read each frame's `pts_time`, render the strip with
+`scripts/timestamped-strip.sh`, and include one frame before the change and one
+after it settles. Pair light/dark or before/after shots of the same item, and say
+why their clocks differ when they come from devices in different time zones.
+

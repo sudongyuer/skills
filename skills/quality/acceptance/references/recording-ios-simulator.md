@@ -75,6 +75,28 @@ Tag the direct recording with provenance `cli` and deterministic frame/contact-s
 transforms with `program`. Cite them using the shared contract in
 [evidence.md](./evidence.md).
 
+## Timestamped frame strips for timing claims
+
+An observation that names times ("the list appears at 2.37s, 140ms after the sheet
+settles") needs frames that carry those times. Label each frame with its
+presentation time from the stream: recordings are variable frame rate, so frame
+index × 1/fps is wrong, and an unlabeled strip cannot back the claim.
+
+```bash
+# List frame indices with their times, pick the ones around the transition.
+ffprobe -v error -select_streams v -show_entries frame=pts_time -of csv=p=0 \
+  $DIR/assets/ios-flow.mp4 | tr -d ',' | awk '{print NR-1, $1}'
+
+# Lay them out left to right, each labeled with its time (macOS; compiles once).
+<skill-dir>/scripts/timestamped-strip.sh $DIR/assets/ios-flow.mp4 \
+  $DIR/assets/flow-frames.png 200 5 9 14 21 32
+```
+
+Cover the whole claimed interval, including one frame before the change starts
+and one after it settles; a strip that opens on the end state proves nothing about
+order. Quote the labeled times in `observation`, and crop to the region that
+changes when the full screen makes the change unreadable.
+
 ## Measure motion along one scanline
 
 Use this to prove that an element did or did not move (a shake, a jump, a
